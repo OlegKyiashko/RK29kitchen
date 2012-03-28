@@ -1,13 +1,15 @@
 #!/bin/bash
-BASE_DIR=`dirname $0`
+export BASE_DIR=`dirname $0`
+export PATH=${BASE_DIR}/bin:$PATH
 
-tempfile=`mktemp 2>/dev/null` || tempfile=/tmp/test$$
+export tempfile=`mktemp 2>/dev/null` || tempfile=/tmp/rk29$$
 trap "rm -f $tempfile" 0 1 2 5 15
 
 declare MENUITEM
 declare FUNCTION
 N=0
 #1 - menu title; 2-function
+
 MenuAdd() {
 	N=$[N+1]
 	MENUITEM[$N]="\"$N\" \"$1\""
@@ -22,11 +24,11 @@ dialogYN(){
 	dialog --yesno "$1" 5 50
 }
 
-for file in ${BASE_DIR}/plugins/*
+for file in ${BASE_DIR}/plugins/[0-9][0-9]\.*\.sh
 do
-#	echo process $file
 	source $file
 done
+
 MenuAdd "Exit" "exit 0"
 
 while [ true ]
