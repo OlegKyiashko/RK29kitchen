@@ -1,6 +1,9 @@
 #!/bin/bash
-export BASE_DIR=`dirname $0`
-export PATH=${BASE_DIR}/bin:$PATH
+
+export BASEDIR=`dirname $0`
+export WORKDIR=${1:-`pwd`"/"}
+
+export PATH=${BASEDIR}/bin:$PATH
 
 export tempfile=`mktemp 2>/dev/null` || tempfile=/tmp/rk29$$
 trap "rm -f $tempfile" 0 1 2 5 15
@@ -17,33 +20,38 @@ MenuAdd() {
 }
 
 dialogMSG(){
-	dialog --msgbox "$1" 5 50
+	dialog --msgbox "$1" 5 70
 }
 
 dialogYN(){
-	dialog --yesno "$1" 5 50
+	dialog --yesno "$1" 5 70
 }
 
-for file in ${BASE_DIR}/plugins/[0-9][0-9]\.*\.sh
+for file in ${BASEDIR}/plugins/[0-9][0-9]\.*\.sh
 do
 	source $file
 done
 
 MenuAdd "Exit" "exit 0"
 
+workdirTest
+if [ ${WORKTYPE} -eq 99 ]
+then
+	workdirSelect
+fi
+
 while [ true ]
 do
-	echo ${MENUITEM[@]}|xargs dialog --title 'RK29xx ROM kitchen' --menu 'Select command' 15 50 7 2> $tempfile
+	echo ${MENUITEM[@]}|xargs dialog --title 'RK29xx WORK kitchen' --menu "Work dir: ${WORKDIR}\nMode:${WORKMODE}\nSelect command" 20 70 10 2> $tempfile
 	case $? in
 		0)
 			s=`cat $tempfile`
-			echo $s ${FUNCTION[$s]} >ss
 			${FUNCTION[$s]}
 			;;
 		*)
 			break
 			;;
 	esac
-        echo -n "Press Enter to continue..."
-        read a
+	echo -n "Press Enter to continue..."
+	read a
 done

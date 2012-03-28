@@ -17,7 +17,7 @@ parameterParse() {
 	then
 		PARAMFILE="parameter1G"
 	else
-		dialog --msgbox "File parameter(1G) does not exist" 5 50
+		dialogiMSG "File parameter(1G) does not exist"
 		return	
 	fi
 
@@ -30,7 +30,7 @@ parameterParse() {
 		CMDPRE=${BASH_REMATCH[1]}
 		PARTS=${BASH_REMATCH[2]}
 	else
-		dialog --msgbox "Ill-formed config line" 5 50
+		dialogMSG "Ill-formed config line"
 		return
 	fi
 
@@ -91,7 +91,7 @@ parameterEdit(){
 
 			bsize=$[$ssize/2048]
 			dialog --colors --title "Resize partitions" \
-				--inputbox "Change size of the \Z1$name\Zn partition.\nCurrent value is \Z1${bsize}MB\Zn (${ssize} blocs)\nNew value (MB):" 10 50 ${bsize} 2> $tempfile
+				--inputbox "Change size of the \Z1$name\Zn partition.\nCurrent value is \Z1${bsize}MB\Zn (${ssize} blocs)\nNew value (MB):" 10 70 ${bsize} 2> $tempfile
 
 			case $? in
 				0)
