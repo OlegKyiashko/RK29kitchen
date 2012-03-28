@@ -1,0 +1,12 @@
+Credits:
+	Some files retrieved from https://github.com/jhonxie/rk2918_tools
+	Some files retrieved from https://github.com/naobsd/rkutils
+	*bootimg.pl
+		https://github.com/wesgarner/bin.git
+	mkbootimg
+		Built from the Android source
+
+You need the following packages:
+	sudo apt-get install build-essential libusb-1.0-0-dev libssl-dev
+Build the source with:
+	make
