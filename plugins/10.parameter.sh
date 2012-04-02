@@ -9,6 +9,26 @@ declare SECTION
 declare SSIZE
 MODEL="CUBE U9GT 2"
 
+parameterMenu(){
+	while [ true]
+	do
+		dialog --color --title "Work with parameter file" 20 70 10 \
+			"P" "Parse parameter file" \
+			"E" "Edit parameter file" \
+			"M" "Make new parameter file" 2> $tempfile
+	case $? in
+		'P')
+			s=`cat $tempfile`
+			${FUNCTION[$s]}
+			;;
+		*)
+			break
+			;;
+	esac
+	echo -n "Press Enter to continue..."
+	read a
+
+}
 parameterParse() {
 	if [ -f "parameter" ]
 	then

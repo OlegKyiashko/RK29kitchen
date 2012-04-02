@@ -4,9 +4,6 @@
 MenuAdd "Select work directory" "workdirSelect"
 
 workdirTest(){
-	c=`ls -1 ${WORKDIR}/parameter ${WORKDIR}/parameter1G ${WORKDIR}/Image/*img ${WORKDIR}/RK29xx*bin 2>/dev/null | wc -l `
-	if [ $c -gt 6 ]
-	then
 		c=`ls -1 ${WORKDIR}/Image/zImage 2>/dev/null | wc -l `
 		if [ $c -eq 1 ]
 		then
@@ -15,25 +12,22 @@ workdirTest(){
 			return
 		fi
 
-		c=`ls -1 ${WORKDIR}/Image/kernel.img 2>/dev/null | wc -l `
-		if [ $c -eq 1 ]
-		then
-			WORKTYPE=3
-			WORKMODE="img unpacked"
-			return
-		fi
-
+	c=`ls -1 ${WORKDIR}/parameter ${WORKDIR}/parameter1G ${WORKDIR}/Image/*img ${WORKDIR}/RK29xx*bin 2>/dev/null | wc -l `
+	if [ $c -gt 6 ]
+	then
 		WORKTYPE=1
 		WORKMODE="Image"
 		return
 	fi
+
 	c=`ls -1 ${WORKDIR}/*img 2>/dev/null | wc -l `
 	if [ c -gt 1 ]
 	then
 		WORKTYPE=4
-		WORKMODE="*.img"
+		WORKMODE="*img file"
 		return
 	fi
+
 	#fail
 	WORKTYPE=99
 	WORKMODE="Undefined"
