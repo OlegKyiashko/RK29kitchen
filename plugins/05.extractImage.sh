@@ -1,4 +1,4 @@
-#set -vx
+set -vx
 
 MenuAdd "Extract image files" "extractMain"
 
@@ -56,7 +56,7 @@ extractImgFileSelect(){
 	while [ true ]
 	do
 		IMGFILE=""
-		dialog --fselect "${WORKDIR}" 50 70 2>$tempfile
+		dialog --title "Choose img file" --fselect "${WORKDIR}" 20 70 2>$tempfile
 		case $? in
 			0)
 				f=`cat $tempfile`
@@ -70,7 +70,7 @@ extractImgFileSelect(){
 		dialogYN "img file not selected. Exit?"
 		case $? in
 			0)
-				return	
+				return
 				;;
 			*)
 				continue
@@ -106,13 +106,16 @@ extractMain(){
                         extractImage
                         workdirTest
                         ;;
-                "img file")
+                "*img file")
+                        extractImgFileSelect
                         extractImgFile
                         workdirTest
                         ;;
                 "In progress")
                         dialogMSG "Files extracted some tme ago :)"
+                        ;;
                 *)
-                        dialogMSG "Mode unsupported now ^("
+                        dialogMSG "Mode unsupported now :("
+                        ;;
         esac
 }

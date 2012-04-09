@@ -1,8 +1,15 @@
 #!/bin/bash
 
 export BASEDIR=`dirname $0`
+if [ $BASEDIR == '.' ]
+then
+        BASEDIR=`pwd`
+fi
+
 export BINDIR=${BASEDIR}/bin
 export WORKDIR=${1:-`pwd`"/"}
+
+cd ${WORKDIR}
 
 export PATH=${BINDIR}:$PATH
 
@@ -28,6 +35,11 @@ dialogYN(){
 	dialog --yesno "$1" 5 70
 }
 
+pressEnterToContinue(){
+	echo -n "Press Enter to continue..."
+	read a
+}
+
 for file in ${BASEDIR}/plugins/[0-9][0-9]\.*\.sh
 do
 	source $file
@@ -36,11 +48,11 @@ done
 MenuAdd "Exit" "exit 0"
 
 workdirTest
-if [ ${WORKTYPE} -eq 99 ]
-then
-	workdirSelect
-fi
-
+#if [ ${WORKTYPE} -eq 99 ]
+#then
+#	workdirSelect
+#fi
+set >aaa
 while [ true ]
 do
 	echo ${MENUITEM[@]}|xargs dialog --title 'RK29xx toolkit' --menu "Work dir: ${WORKDIR}\nMode:${WORKMODE}\nSelect command" 20 70 10 2> $tempfile
@@ -53,7 +65,6 @@ do
 			break
 			;;
 	esac
-	echo -n "Press Enter to continue..."
-	read a
+        #pressEnterToContinue
 done
 

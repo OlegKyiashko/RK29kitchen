@@ -2,15 +2,17 @@
 #set -vx
 
 MenuAdd "Select work directory" "workdirSelect"
+WORKTYPE=99
+WORKMODE="Undefined"
 
 workdirTest(){
-		c=`ls -1 ${WORKDIR}/Image/zImage 2>/dev/null | wc -l `
-		if [ $c -eq 1 ]
-		then
-			WORKTYPE=2
-			WORKMODE="In progress"
-			return
-		fi
+	c=`ls -1 ${WORKDIR}/Image/zImage 2>/dev/null | wc -l `
+	if [ $c -eq 1 ]
+	then
+		WORKTYPE=2
+		WORKMODE="In progress"
+		return
+	fi
 
 	c=`ls -1 ${WORKDIR}/parameter ${WORKDIR}/parameter1G ${WORKDIR}/Image/*img ${WORKDIR}/RK29xx*bin 2>/dev/null | wc -l `
 	if [ $c -gt 6 ]
@@ -21,7 +23,7 @@ workdirTest(){
 	fi
 
 	c=`ls -1 ${WORKDIR}/*img 2>/dev/null | wc -l `
-	if [ c -gt 1 ]
+	if [ $c -gt 0 ]
 	then
 		WORKTYPE=4
 		WORKMODE="*img file"
@@ -37,12 +39,11 @@ workdirTest(){
 workdirSelect(){
 	while [ true ]
 	do
-		dialog --dselect "${WORKDIR}" 20 70 2> $tempfile
+		dialog --title "Choose work directory" --dselect "${WORKDIR}" 20 70 2> $tempfile
 		case $? in
 			0)
 				cd `cat $tempfile`
 				WORKDIR=`pwd`"/"
-				export WORKDIR
 				workdirTest
 				case $WORKTYPE in
 					99)

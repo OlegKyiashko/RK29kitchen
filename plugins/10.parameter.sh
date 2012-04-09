@@ -1,34 +1,12 @@
 #!/bin/bash
-#set -vx
+set -vx
 
-MenuAdd "Parse parameter file" "parameterParse"
-MenuAdd "Edit parameter file" "parameterEdit"
-MenuAdd "Make new parameter file" "parameterMake"
+MenuAdd "Parameter file" "parameterMenu"
 
 declare SECTION
 declare SSIZE
 MODEL="CUBE U9GT 2"
 
-parameterMenu(){
-	while [ true]
-	do
-		dialog --color --title "Work with parameter file" 20 70 10 \
-			"P" "Parse parameter file" \
-			"E" "Edit parameter file" \
-			"M" "Make new parameter file" 2> $tempfile
-	case $? in
-		'P')
-			s=`cat $tempfile`
-			${FUNCTION[$s]}
-			;;
-		*)
-			break
-			;;
-	esac
-	echo -n "Press Enter to continue..."
-	read a
-
-}
 parameterParse() {
 	if [ -f "parameter" ]
 	then
@@ -178,4 +156,37 @@ parameterMake(){
 	diff -c ${PARAMFILE} ${PARAMFILE}.new >${PARAMFILE}.patch
 }
 
+
+parameterMenu(){
+	while [ true ]
+	do
+		dialog  --title "Work with parameter file" --menu "Select:" 20 70 10 \
+			"P" "Parse parameter file" \
+			"E" "Edit parameter file" \
+			"M" "Make new parameter file" \
+			"X" "Exit" 2> $tempfile
+		case $? in
+			0)
+				s=`cat $tempfile`
+				case $s in
+					'P')
+						parameterParse
+						;;
+					'E')
+						parameterEdit
+						;;
+					'M')
+						parameterMake
+						;;
+					'X')
+						return
+						;;
+				esac
+				;;
+			*)
+				break
+				;;
+		esac
+	done
+}
 
