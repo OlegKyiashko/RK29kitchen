@@ -28,11 +28,11 @@ MenuAdd() {
 }
 
 dialogMSG(){
-	dialog --msgbox "$1" 5 70
+	dialog --msgbox "$1" 8 70
 }
 
 dialogYN(){
-	dialog --yesno "$1" 5 70
+	dialog --yesno "$1" 8 70
 }
 
 pressEnterToContinue(){
@@ -48,11 +48,11 @@ done
 MenuAdd "Exit" "exit 0"
 
 workdirTest
-#if [ ${WORKTYPE} -eq 99 ]
-#then
-#	workdirSelect
-#fi
-set >aaa
+if [ ${WORKTYPE} -eq 99 ]
+then
+	workdirSelect
+fi
+
 while [ true ]
 do
 	echo ${MENUITEM[@]}|xargs dialog --title 'RK29xx toolkit' --menu "Work dir: ${WORKDIR}\nMode:${WORKMODE}\nSelect command" 20 70 10 2> $tempfile

@@ -1,23 +1,15 @@
 #!/bin/bash
-set -vx
+#set -vx
 
-MenuAdd "Parameter file" "parameterMenu"
+MenuAdd "Edit parameter file" "parameterMenu"
 
 declare SECTION
 declare SSIZE
 MODEL="CUBE U9GT 2"
 
 parameterParse() {
-	if [ -f "parameter" ]
-	then
-		PARAMFILE="parameter"
-	elif [ -f "parameter1G" ]
-	then
-		PARAMFILE="parameter1G"
-	else
-		dialogiMSG "File parameter(1G) does not exist"
-		return	
-	fi
+
+        MODEL=`grep MACHINE_MODEL ${PARAMFILE}|cut -d: -f2`
 
 	CMDLINE=`grep CMDLINE ${PARAMFILE}`
 
@@ -60,17 +52,20 @@ parameterParse() {
 		SSIZE[$n]=$ssize
 		n=$[n+1]
 	done
-	parameterInfo >${PARAMFILE}.info
 }
 
 parameterEdit(){
-	if [ "x${CMDLINE}" == "x" ]
-	then
-		dialogMSG "Param file don't parsed before"
-		return
-	fi
 
-	dialogYN "Quiet boot mode?"
+	dialog --title "Model name" --colors \
+		--menu "Current value is \Z1${MODEL}\Zn\nNew value:" 20 70 10 \
+                "${MODEL}"  "" "CUBE U9GT 2 "  "" "N90 " "" "LR97A01" "" 2> $tempfile
+	case $? in
+		0)
+			MODEL=`cat $tempfile`
+			;;
+	esac
+
+	dialogYN "Quiet boot mode: ${QUIET}\n Enable quiet boot mode?"
 	case $? in
 		0)
 			QUIET='quiet'
@@ -100,38 +95,9 @@ parameterEdit(){
 			esac
 		fi
 	done
-	parameterInfo >${PARAMFILE}.new.info
-}
-
-parameterInfo(){
-	if [ "x${CMDLINE}" == "x" ]
-	then
-		dialogMSG "Param file don't parsed before"
-		return
-	fi
-
-	for (( n=0; n<${#SECTION[@]}; n++ ))
-	do
-		name=${SECTION[$n]}
-		ssize=${SSIZE[$n]}
-		if [ $ssize != '-' ]
-		then
-			bsize=$[$ssize/2048]
-		else
-			bsize='-'
-		fi
-		echo -e section:$name   size=$bsize MB     $ssize blocks
-	done
-
 }
 
 parameterMake(){
-	if [ "x${CMDLINE}" == "x" ]
-	then
-		dialogMSG "Param file don't parsed before"
-		return
-	fi
-
 	HEADER="FIRMWARE_VER:0.2.3\nMACHINE_MODEL:$MODEL \nMACHINE_ID:007\nMANUFACTURER:RK29SDK\nMAGIC: 0x5041524B\nATAG: 0x60000800\nMACHINE: 2929\nCHECK_MASK: 0x80\nKERNEL_IMG: 0x60408000\n"
 	NEWCMDLINE="CMDLINE: ${QUIET} console=ttyS1,115200n8n androidboot.console=ttyS1 init=/init initrd=0x62000000,0x800000 mtdparts=rk29xxnand:"
 	#0x00002000@0x00002000(misc),0x00004000@0x00004000(kernel),0x00008000@0x00008000(boot),0x00008000@0x00010000(recovery),0x00100000@0x00018000(backup),0x00002000@0x00118000(kpanic)"
@@ -154,39 +120,49 @@ parameterMake(){
 	done
 	echo -e ${HEADER}${NEWCMDLINE} |unix2dos>${PARAMFILE}.new
 	diff -c ${PARAMFILE} ${PARAMFILE}.new >${PARAMFILE}.patch
+        mv ${PARAMFILE} ${PARAMFILE}.bak
+        mv ${PARAMFILE}.new ${PARAMFILE}
 }
 
+parameterResizeSystem(){
+        dialog --title "Resize system.img" --menu "Choose file system" 20 70 10 2>$tempfile
+}
 
 parameterMenu(){
-	while [ true ]
-	do
-		dialog  --title "Work with parameter file" --menu "Select:" 20 70 10 \
-			"P" "Parse parameter file" \
-			"E" "Edit parameter file" \
-			"M" "Make new parameter file" \
-			"X" "Exit" 2> $tempfile
-		case $? in
-			0)
-				s=`cat $tempfile`
-				case $s in
-					'P')
-						parameterParse
-						;;
-					'E')
-						parameterEdit
-						;;
-					'M')
-						parameterMake
-						;;
-					'X')
-						return
-						;;
-				esac
-				;;
-			*)
-				break
-				;;
-		esac
-	done
+        while [ true ]
+        do
+                dialog --title "Select parameter file" --fselect ${WORKDIR} 20 70 2>$tempfile
+                case $? in
+                        0)
+                                PARAMFILE=`cat $tempfile`
+                                break
+                                ;;
+                        *)
+                                dialogYN "Parameter file is not selected. Exit?"
+                                case $? in
+                                       0)
+                                                return
+                                                ;;
+                                        *)
+                                                continue
+                                                ;;
+                                esac
+                esac
+        done
+
+	parameterParse
+       	parameterEdit
+        dialogYN "Save new ${PARAMETER} file?"
+        case $? in
+                0)
+                        parameterMake
+                        dialogYN "Resize system.img file?"
+                        case $? in
+                                0)
+                                        parameterResizeSystem
+                                        ;;
+                        esac
+                        ;;
+        esac
 }
 

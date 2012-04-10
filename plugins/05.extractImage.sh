@@ -1,4 +1,4 @@
-set -vx
+#set -vx
 
 MenuAdd "Extract image files" "extractMain"
 
@@ -23,7 +23,7 @@ extractExtractFiles(){
 	sudo mount system.img $system
 	sudo find $system -xtype f -print0|xargs -0 ls -ln --time-style="+%F %T"|sed -e's/ ${system}/ \/system/' >_system.lst
 	sudo find $system -xtype f -print0|xargs -0 ls -ln --time-style="+"|sed -e's/ ${system}/ \/system/' >_system.lst2
-	sudo tar zcf system.tar.gz $system
+#	sudo tar zcf system.tar.gz $system
 	sudo umount system
 
 	strings ${zimage} |grep "Linux version" >_kernel.version
