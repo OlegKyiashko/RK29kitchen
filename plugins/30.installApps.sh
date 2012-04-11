@@ -67,7 +67,7 @@ installAPK(){
 		n=$[n+1]
 	done
 
-	echo ${APK[@]}| xargs dialog --title "Install apps as system" --checklist "Choose apk:" 20 70 15 2>$tempfile
+	echo ${APK[@]}| xargs dialog --colors --backtitle "${DIALOGBT}" --title "Install apps as system" --checklist "Choose apk:" 20 70 15 2>$tempfile
 
         cat $tempfile| xargs sudo cp -t ${WORKDIR}/Image/system/app/ 
 
@@ -86,7 +86,8 @@ installMenu(){
 
 	while [ true ]
 	do
-		dialog --title "Install system apps" --menu "Select:" 20 70 10 \
+		dialogBT
+		dialog --colors --backtitle "${DIALOGBT}" --title "Install system apps" --menu "Select:" 20 70 10 \
 			"busybox" "Install busybox" \
 			"su" "Install su" \
 			"apk" "Install apps as system" \

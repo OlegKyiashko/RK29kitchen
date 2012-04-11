@@ -6,10 +6,11 @@ MenuAdd "Edit parameter file" "parameterMenu"
 declare SECTION
 declare SSIZE
 MODEL="CUBE U9GT 2"
+PARAMFILEPARSED=0
 
 parameterParse() {
 
-        MODEL=`grep MACHINE_MODEL ${PARAMFILE}|cut -d: -f2`
+	MODEL=`grep MACHINE_MODEL ${PARAMFILE}|cut -d: -f2`
 
 	CMDLINE=`grep CMDLINE ${PARAMFILE}`
 
@@ -52,13 +53,14 @@ parameterParse() {
 		SSIZE[$n]=$ssize
 		n=$[n+1]
 	done
+	PARAMFILEPARSED=1
 }
 
 parameterEdit(){
-
-	dialog --title "Model name" --colors \
+	dialogBT
+	dialog --colors --backtitle "${DIALOGBT}" --title "Model name" --colors \
 		--menu "Current value is \Z1${MODEL}\Zn\nNew value:" 20 70 10 \
-                "${MODEL}"  "" "CUBE U9GT 2 "  "" "N90 " "" "LR97A01" "" 2> $tempfile
+		"${MODEL}"  "" "CUBE U9GT 2 "  "" "N90 " "" "LR97A01" "" 2> $tempfile
 	case $? in
 		0)
 			MODEL=`cat $tempfile`
@@ -81,9 +83,9 @@ parameterEdit(){
 		ssize=${SSIZE[$n]}
 		if [ $ssize != '-' ]
 		then
-
 			bsize=$[$ssize/2048]
-			dialog --colors --title "Resize partitions" \
+			dialogBT
+			dialog --colors --backtitle "${DIALOGBT}" --title "Resize partitions" \
 				--inputbox "Change size of the \Z1$name\Zn partition.\nCurrent value is \Z1${bsize}MB\Zn (${ssize} blocs)\nNew value (MB):" 10 70 ${bsize} 2> $tempfile
 
 			case $? in
@@ -95,6 +97,7 @@ parameterEdit(){
 			esac
 		fi
 	done
+	PARAMFILEPARSED=2
 }
 
 parameterMake(){
@@ -120,49 +123,54 @@ parameterMake(){
 	done
 	echo -e ${HEADER}${NEWCMDLINE} |unix2dos>${PARAMFILE}.new
 	diff -c ${PARAMFILE} ${PARAMFILE}.new >${PARAMFILE}.patch
-        mv ${PARAMFILE} ${PARAMFILE}.bak
-        mv ${PARAMFILE}.new ${PARAMFILE}
+	mv ${PARAMFILE} ${PARAMFILE}.bak
+	mv ${PARAMFILE}.new ${PARAMFILE}
 }
 
-parameterResizeSystem(){
-        dialog --title "Resize system.img" --menu "Choose file system" 20 70 10 2>$tempfile
+parameterFileSelect(){
+	dialogBT
+	dialog --colors --backtitle "${DIALOGBT}" --title "Select parameter file" --fselect ${WORKDIR} 20 70 2>$tempfile
+	case $? in
+		0)
+			PARAMFILE=`cat $tempfile`
+			parameterParse
+			;;
+	esac
 }
 
 parameterMenu(){
-        while [ true ]
-        do
-                dialog --title "Select parameter file" --fselect ${WORKDIR} 20 70 2>$tempfile
-                case $? in
-                        0)
-                                PARAMFILE=`cat $tempfile`
-                                break
-                                ;;
-                        *)
-                                dialogYN "Parameter file is not selected. Exit?"
-                                case $? in
-                                       0)
-                                                return
-                                                ;;
-                                        *)
-                                                continue
-                                                ;;
-                                esac
-                esac
-        done
+	while [ true ]
+	do
+		parameterFileSelect
 
-	parameterParse
-       	parameterEdit
-        dialogYN "Save new ${PARAMETER} file?"
-        case $? in
-                0)
-                        parameterMake
-                        dialogYN "Resize system.img file?"
-                        case $? in
-                                0)
-                                        parameterResizeSystem
-                                        ;;
-                        esac
-                        ;;
-        esac
+		if [ ${PARAMFILEPARSED} -ne 0 ]
+		then
+			break
+		fi
+		dialogYN "Parameter file is not selected or incorrect. Exit?"
+		case $? in
+			0)
+				return
+				;;
+			*)
+				continue
+				;;
+		esac
+	done
+
+	parameterEdit
+
+	dialogYN "Save new ${PARAMETER} file?"
+	case $? in
+		0)
+			parameterMake
+			dialogYN "Resize system.img file?"
+			case $? in
+				0)
+					parameterResizeSystem
+					;;
+			esac
+			;;
+	esac
 }
 

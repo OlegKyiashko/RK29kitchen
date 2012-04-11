@@ -39,7 +39,8 @@ workdirTest(){
 workdirSelect(){
 	while [ true ]
 	do
-		dialog --title "Choose work directory" --dselect "${WORKDIR}" 20 70 2> $tempfile
+		dialogBT
+		dialog --colors --backtitle "${DIALOGBT}" --title "Choose work directory" --dselect "${WORKDIR}" 20 70 2> $tempfile
 		case $? in
 			0)
 				cd `cat $tempfile`

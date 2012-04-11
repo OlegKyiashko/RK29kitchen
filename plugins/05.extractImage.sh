@@ -56,7 +56,8 @@ extractImgFileSelect(){
 	while [ true ]
 	do
 		IMGFILE=""
-		dialog --title "Choose img file" --fselect "${WORKDIR}" 20 70 2>$tempfile
+		dialogBT
+		dialog --colors --backtitle "${DIALOGBT}" --title "Choose img file" --fselect "${WORKDIR}" 20 70 2>$tempfile
 		case $? in
 			0)
 				f=`cat $tempfile`

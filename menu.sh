@@ -1,4 +1,5 @@
 #!/bin/bash
+#set -vx 
 
 export BASEDIR=`dirname $0`
 if [ $BASEDIR == '.' ]
@@ -7,7 +8,7 @@ then
 fi
 
 export BINDIR=${BASEDIR}/bin
-export WORKDIR=${1:-`pwd`"/"}
+export WORKDIR=${1:-`pwd`"/work/"}
 
 cd ${WORKDIR}
 
@@ -27,12 +28,18 @@ MenuAdd() {
 	FUNCTION[$N]="$2"
 }
 
+dialogBT(){
+	DIALOGBT="Work dir: \Z1${WORKDIR}\Zn Mode:\Z2${WORKMODE}\Zn Parameter file:\Z3${PARAMFILE}\Zn" 
+}
+
 dialogMSG(){
-	dialog --msgbox "$1" 8 70
+	dialogBT
+	dialog --colors --backtitle "${DIALOGBT}" --msgbox "$1" 8 70
 }
 
 dialogYN(){
-	dialog --yesno "$1" 8 70
+	dialogBT
+	dialog --colors --backtitle "${DIALOGBT}" --yesno "$1" 8 70
 }
 
 pressEnterToContinue(){
@@ -55,7 +62,8 @@ fi
 
 while [ true ]
 do
-	echo ${MENUITEM[@]}|xargs dialog --title 'RK29xx toolkit' --menu "Work dir: ${WORKDIR}\nMode:${WORKMODE}\nSelect command" 20 70 10 2> $tempfile
+	dialogBT
+	echo ${MENUITEM[@]}|xargs dialog --colors --backtitle "${DIALOGBT}" --title 'RK29xx toolkit' --menu "Select command" 20 70 10 2> $tempfile
 	case $? in
 		0)
 			s=`cat $tempfile`
@@ -65,6 +73,6 @@ do
 			break
 			;;
 	esac
-        #pressEnterToContinue
+        pressEnterToContinue
 done
 
