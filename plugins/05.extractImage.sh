@@ -1,3 +1,4 @@
+#!/bin/bash
 #set -vx
 
 MenuAdd "Extract image files" "extractMain"

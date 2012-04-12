@@ -10,7 +10,7 @@ PARAMFILEPARSED=0
 
 parameterParse() {
 
-	MODEL=`grep MACHINE_MODEL ${PARAMFILE}|cut -d: -f2`
+	MODEL=`grep MACHINE_MODEL ${PARAMFILE}|cut -d: -f2|tr -d "\n\r"`
 
 	CMDLINE=`grep CMDLINE ${PARAMFILE}`
 
@@ -91,7 +91,7 @@ parameterEdit(){
 			case $? in
 				0)
 					s=`cat $tempfile`
-					s=$[s*2048]
+					s=$[$s*2048]
 					SSIZE[$n]=`printf 0x%08x $s`
 					;;
 			esac
@@ -128,21 +128,16 @@ parameterMake(){
 }
 
 parameterFileSelect(){
-	dialogBT
-	dialog --colors --backtitle "${DIALOGBT}" --title "Select parameter file" --fselect ${WORKDIR} 20 70 2>$tempfile
-	case $? in
-		0)
-			PARAMFILE=`cat $tempfile`
-			parameterParse
-			;;
-	esac
-}
-
-parameterMenu(){
 	while [ true ]
 	do
-		parameterFileSelect
-
+		dialogBT
+		dialog --colors --backtitle "${DIALOGBT}" --title "Select parameter file" --fselect ${WORKDIR} 20 70 2>$tempfile
+		case $? in
+			0)
+				PARAMFILE=`cat $tempfile`
+				parameterParse
+				;;
+		esac
 		if [ ${PARAMFILEPARSED} -ne 0 ]
 		then
 			break
@@ -157,6 +152,21 @@ parameterMenu(){
 				;;
 		esac
 	done
+}
+
+parameterMenu(){
+	if [ "${WORKMODE}" != "In progress" ] && [ "${WORKMODE}" != "Image" ]
+	then
+		dialogMSG "You should extract image files before continue..."
+		return
+	fi
+
+	parameterFileSelect
+
+	if [ ${PARAMFILEPARSED} -eq 0 ]
+	then
+		return
+	fi
 
 	parameterEdit
 
@@ -164,12 +174,10 @@ parameterMenu(){
 	case $? in
 		0)
 			parameterMake
-			dialogYN "Resize system.img file?"
-			case $? in
-				0)
-					parameterResizeSystem
-					;;
-			esac
+			;;
+		*)
+			PARAMFILEPARSED=0
+			PARAMFILE=""
 			;;
 	esac
 }

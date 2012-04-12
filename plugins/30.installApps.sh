@@ -77,8 +77,7 @@ installAPK(){
 }
 
 installMenu(){
-
-	if [ "${WORKMODE}" != "In progress" ]
+	if [ "${WORKMODE}" != "In progress" ] && [ "${WORKMODE}" != "Image" ]
 	then
 		dialogMSG "You should extract image files before continue..."
 		return
