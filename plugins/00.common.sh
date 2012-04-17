@@ -20,6 +20,12 @@ dialogYN(){
 	dialog --colors --backtitle "${DIALOGBT}" --yesno "$1" 8 70
 }
 
+dialogLOG(){
+	dialogBT
+	dialog --colors --backtitle "${DIALOGBT}" --msgbox "$1" 8 70
+	dialog --colors --backtitle "${DIALOGBT}" --title "Show log" --textbox ""${LOGFILE}"" 20 70
+}
+
 pressEnterToContinue(){
 	echo -n "Press Enter to continue..."
 	read a

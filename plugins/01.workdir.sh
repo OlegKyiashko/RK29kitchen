@@ -16,7 +16,7 @@ workdirTest(){
 		return
 	fi
 
-	c=`ls -1 parameter parameter1G /Image/*img RK29xx*bin 2>/dev/null | wc -l `
+	c=`ls -1 parameter parameter1G Image/*img RK29xx*bin 2>/dev/null | wc -l `
 	if [ $c -gt 6 ]
 	then
 		WORKTYPE=1

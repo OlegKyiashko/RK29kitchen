@@ -54,9 +54,7 @@ resizeSystemProcess(){
 
 	if [ $r -ne 0 ]
 	then
-		dialogOK "Resize process has errors"
-		dialogBT
-		dialog --colors --backtitle "${DIALOGBT}" --title "Show log" --textbox ""${LOGFILE}"" 20 70
+		dialogLOG "Resize process has errors"
 	else
 		mv system.img system.img.bak  2>> "${LOGFILE}"
 		mv system.new system.img  2>> "${LOGFILE}"
@@ -152,7 +150,7 @@ resizeSystemMenu(){
 	do
 		dialogBT
 		dialog --colors --backtitle "${DIALOGBT}" --title "Resize system.img (/system partition)" \
-			--menu "Select:" 20 70 10 \
+			--menu "Select:" 20 70 15 \
 			"P" "Use size from file 'parameter'"\
 			"S" "Set value"\
 			"U" "Update file 'parameter' by system.img file size" \

@@ -30,12 +30,6 @@ extractUmount(){
 	fi		
 }
 
-extractStripFilesKRNL(){
-	sz=`stat -c%s "$1"`
-	sz=$[${sz}-12]
-	dd if="$1" bs=1024K |dd bs=1 skip=8 count=${sz}|dd of=$2 bs=1024K
-}
-
 extractExtractFiles(){
 	mkdir -p $ramdisk
 	zcat $initrd | ( cd $ramdisk; cpio -idm )
@@ -55,21 +49,28 @@ extractExtractFiles(){
 extractImage(){
 	pushd Image
 
-	extractStripFilesKRNL "boot.img" "${initrd}"
-	extractStripFilesKRNL "kernel.img" "${zimage}"
+	mkkrnlimg -r "boot.img" "${initrd}"
+	mkkrnlimg -r "kernel.img" "${zimage}"
 
 	extractExtractFiles
 
-	echo "bootsize = 0x6a4000" > bootimg.cfg
-	echo "pagesize = 0x4000" >> bootimg.cfg
-	echo "kerneladdr = 0x60408000" >> bootimg.cfg
-	echo "ramdiskaddr = 0x62000000" >> bootimg.cfg
-	echo "secondaddr = 0x60f00000" >> bootimg.cfg
-	echo "tagsaddr = 0x60088000" >> bootimg.cfg
-	echo "name = " >> bootimg.cfg
-	echo "cmdline = " >> bootimg.cfg
+	cp "${PLUGINS}"/extractImage/bootimg.cfg .
 
 	popd
+
+	cp "${PLUGINS}"/extractImage/package-file .
+	cp "${PLUGINS}"/extractImage/recover-script .
+	cp "${PLUGINS}"/extractImage/update-script .
+	
+	mv parameter1G parameter 2>/dev/null
+
+	BOOTLOADER=`grep bootloader package-file |cut -f2|tr -d "\n\r"`
+	bl=`ls -1 RK29*bin`
+	if [ "$BOOTLOADER" != "$bl" ]
+	then
+		commonBackupFile package-file
+		cat COMMONBACKUPFILE| sed -e "s/${BOOTLOADER}/${bl}/" > package-file
+	fi
 
 	WORKTYPE=2
 	WORKMODE="In progress"

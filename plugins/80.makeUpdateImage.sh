@@ -73,6 +73,8 @@ makeUpdateMkInitRD(){
 	cd ..	
 	abootimg --create boot.img -k $zimage -r ${initrd}
 
+	mkkrnlimg -r "${zimage}" kernel.img
+
 	popd
 }
 
@@ -82,7 +84,12 @@ makeUpdateImage(){
 	then
 		makeUpdateParseBL
 	fi
-	afptool -pack . ${img}.tmp
+	afptool -pack . ${img}.tmp 2>>"${LOGFILE}"
+	if [ ! -f "${img}.tmp" ]
+	then
+		dialogLOG "Make update image error"
+		exit 1
+	fi
 	commonBackupFile ${img}
 	img_maker $BOOTLOADER ${img}.tmp ${img}
 	rm ${img}.tmp
