@@ -7,18 +7,19 @@ then
 	BASEDIR=`pwd`
 fi
 
-WORKDIR=${1:-`pwd`"/work/"}
-if [ "$WORKDIR" == '.' ]
+WORKDIR=${1:-`pwd`}
+if [ "$WORKDIR" == '.' ] || [ "${WORKDIR}" == "${BASEDIR}" ]
 then
-	WORKDIR=`pwd`"/"
+	WORKDIR=`pwd`"/work/"
 fi
 
 BINDIR="${BASEDIR}/bin"
 LOGFILE="${BASEDIR}/log"
+PLUGINS="${BASEDIR}/plugins"
 PATH="${BINDIR}":$PATH
 tempfile=`mktemp 2>/dev/null` || tempfile=/tmp/rk29$$
 
-export BASEDIR WORKDIR BINDIR LOGFILE PATH tempfile
+export BASEDIR WORKDIR BINDIR LOGFILE PATH tempfile PLUGINS
 
 trap "rm -f $tempfile" 0 1 2 5 15
 
@@ -27,7 +28,7 @@ declare FUNCTION
 
 rm "${LOGFILE}"
 touch "${LOGFILE}"
-chmod +x "${BINDIR}/*"
+chmod +x "${BINDIR}/"*
 
 
 #1 - menu title; 2-function
@@ -38,7 +39,7 @@ MenuAdd() {
 	FUNCTION[$N]="$2"
 }
 
-for file in ./plugins/[0-9][0-9]\.*\.sh
+for file in `ls -1 "${PLUGINS}"/[0-9][0-9]\.*\.sh`
 do
         chmod +x $file
 	source $file
@@ -56,7 +57,7 @@ fi
 while [ true ]
 do
 	dialogBT
-	echo ${MENUITEM[@]}|xargs dialog --colors --backtitle "${DIALOGBT}" --title 'RK29xx toolkit' --menu "Select command" 20 70 10 2> $tempfile
+	echo ${MENUITEM[@]}|xargs dialog --colors --backtitle "${DIALOGBT}" --title 'RK29xx toolkit' --menu "Select command" 20 70 15 2> $tempfile
 	case $? in
 		0)
 			s=`cat $tempfile`
