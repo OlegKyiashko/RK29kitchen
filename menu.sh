@@ -1,67 +1,52 @@
 #!/bin/bash
-#set -vx 
+set -vx 
 
 BASEDIR=`dirname $0`
-if [ $BASEDIR == '.' ]
+if [ "$BASEDIR" == '.' ]
 then
 	BASEDIR=`pwd`
 fi
-export BASEDIR
-export BINDIR=${BASEDIR}/bin
-export WORKDIR=${1:-`pwd`"/work/"}
-export LOGFILE=${WORKDIR}/log
-export PATH=${BINDIR}:$PATH
-export tempfile=`mktemp 2>/dev/null` || tempfile=/tmp/rk29$$
+
+WORKDIR=${1:-`pwd`"/work/"}
+if [ "$WORKDIR" == '.' ]
+then
+	WORKDIR=`pwd`"/"
+fi
+
+BINDIR="${BASEDIR}/bin"
+LOGFILE="${BASEDIR}/log"
+PATH="${BINDIR}":$PATH
+tempfile=`mktemp 2>/dev/null` || tempfile=/tmp/rk29$$
+
+export BASEDIR WORKDIR BINDIR LOGFILE PATH tempfile
 
 trap "rm -f $tempfile" 0 1 2 5 15
 
 declare MENUITEM
 declare FUNCTION
 
-cd ${WORKDIR}
-rm ${LOGFILE}
-touch ${LOGFILE}
+rm "${LOGFILE}"
+touch "${LOGFILE}"
+chmod +x "${BINDIR}/*"
 
-N=0
 
 #1 - menu title; 2-function
+N=0
 MenuAdd() {
 	N=$[N+1]
 	MENUITEM[$N]="\"$N\" \"$1\""
 	FUNCTION[$N]="$2"
 }
 
-dialogBT(){
-	DIALOGBT="Work dir: \Z1${WORKDIR}\Zn Mode:\Z2${WORKMODE}\Zn Parameter file:\Z3${PARAMFILE}\Zn" 
-}
-
-dialogINF(){
-	dialogBT
-	dialog --colors --backtitle "${DIALOGBT}" --infobox "$1" 8 70
-}
-
-dialogMSG(){
-	dialogBT
-	dialog --colors --backtitle "${DIALOGBT}" --msgbox "$1" 8 70
-}
-
-dialogYN(){
-	dialogBT
-	dialog --colors --backtitle "${DIALOGBT}" --yesno "$1" 8 70
-}
-
-pressEnterToContinue(){
-	echo -n "Press Enter to continue..."
-	read a
-}
-
-for file in ${BASEDIR}/plugins/[0-9][0-9]\.*\.sh
+for file in ./plugins/[0-9][0-9]\.*\.sh
 do
+        chmod +x $file
 	source $file
 done
 
 MenuAdd "Exit" "exit 0"
 
+cd "${WORKDIR}"
 workdirTest
 if [ ${WORKTYPE} -eq 99 ]
 then

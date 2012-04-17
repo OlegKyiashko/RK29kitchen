@@ -1,6 +1,7 @@
 #!/bin/bash
 #set -vx
 
+MenuAdd "Select parameter file" "parameterFileSelect"
 MenuAdd "Edit parameter file" "parameterMenu"
 
 declare SECTION
@@ -11,17 +12,11 @@ PARAMFILEPARSED=0
 parameterParse() {
 
 	MODEL=`grep MACHINE_MODEL ${PARAMFILE}|cut -d: -f2|tr -d "\n\r"`
+	CMDLINE=`grep CMDLINE ${PARAMFILE}|cut -d: -f2|tr -d "\n\r"`
 
-	CMDLINE=`grep CMDLINE ${PARAMFILE}`
-
-	REGEXP="(^CMDLINE.*mtdparts=rk29xxnand:)(.*)$"
-
-	if [[ "${CMDLINE}" =~ ${REGEXP} ]]
+	if [ -z "${CMDLINE}" ] || [ -z "${MODEL}" ]
 	then
-		CMDPRE=${BASH_REMATCH[1]}
-		PARTS=${BASH_REMATCH[2]}
-	else
-		dialogMSG "Ill-formed config line"
+		dialogOK "Ill-formed config line"
 		return
 	fi
 
@@ -47,7 +42,7 @@ parameterParse() {
 			ssize='-'
 			sname=${BASH_REMATCH[1]}
 		else
-			dialogMSG 'Ill-formed config line'
+			dialogOK 'Ill-formed config line'
 		fi
 		SECTION[$n]=$sname
 		SSIZE[$n]=$ssize
@@ -58,8 +53,8 @@ parameterParse() {
 
 parameterEdit(){
 	dialogBT
-	dialog --colors --backtitle "${DIALOGBT}" --title "Model name" --colors \
-		--menu "Current value is \Z1${MODEL}\Zn\nNew value:" 20 70 10 \
+	dialog --colors --backtitle "${DIALOGBT}" --title "Edit parameter file"  \
+		--menu "Current MACHINE_MODEV value is \Z1${MODEL}\Zn\nNew value:" 20 70 10 \
 		"${MODEL}"  "" "CUBE U9GT 2 "  "" "N90 " "" "LR97A01" "" 2> $tempfile
 	case $? in
 		0)
@@ -81,20 +76,23 @@ parameterEdit(){
 	do
 		name=${SECTION[$n]}
 		ssize=${SSIZE[$n]}
-		if [ $ssize != '-' ]
+		if [ "$ssize" != '-' ]
 		then
-			bsize=$[$ssize/2048]
-			dialogBT
-			dialog --colors --backtitle "${DIALOGBT}" --title "Resize partitions" \
-				--inputbox "Change size of the \Z1$name\Zn partition.\nCurrent value is \Z1${bsize}MB\Zn (${ssize} blocs)\nNew value (MB):" 10 70 ${bsize} 2> $tempfile
+			if [ "$name" == "system" ] || [ "$name" == "cache" ] || [ "$name" == "userdata" ]
+			then
+				bsize=$[$ssize/2048]
+				dialogBT
+				dialog --colors --backtitle "${DIALOGBT}" --title "Edit parameter file" \
+					--inputbox "Change size of the \Z1$name\Zn partition.\nCurrent value is \Z1${bsize}MB\Zn (${ssize} blocs)\nNew value (MB):" 10 70 ${bsize} 2> $tempfile
 
-			case $? in
-				0)
-					s=`cat $tempfile`
-					s=$[$s*2048]
-					SSIZE[$n]=`printf 0x%08x $s`
-					;;
-			esac
+				case $? in
+					0)
+						s=`cat $tempfile`
+						s=$[$s*2048]
+						SSIZE[$n]=`printf 0x%08x $s`
+						;;
+				esac
+			fi
 		fi
 	done
 	PARAMFILEPARSED=2
@@ -121,17 +119,16 @@ parameterMake(){
 		fi
 		NEWCMDLINE=${NEWCMDLINE}$a
 	done
-	echo -e ${HEADER}${NEWCMDLINE} |unix2dos>${PARAMFILE}.new
-	diff -c ${PARAMFILE} ${PARAMFILE}.new >${PARAMFILE}.patch
-	mv ${PARAMFILE} ${PARAMFILE}.bak
-	mv ${PARAMFILE}.new ${PARAMFILE}
+	commonBackupFile "${PARAMFILE}"
+	echo -e ${HEADER}${NEWCMDLINE} |unix2dos>${PARAMFILE}
+	diff -c ${PARAMFILE} ${COMMONBACKUPFILE} >${PARAMFILE}.patch
 }
 
 parameterFileSelect(){
 	while [ true ]
 	do
 		dialogBT
-		dialog --colors --backtitle "${DIALOGBT}" --title "Select parameter file" --fselect ${WORKDIR} 20 70 2>$tempfile
+		dialog --colors --backtitle "${DIALOGBT}" --title "Select parameter file" --fselect "${WORKDIR}" 20 70 2>$tempfile
 		case $? in
 			0)
 				PARAMFILE=`cat $tempfile`
@@ -157,11 +154,14 @@ parameterFileSelect(){
 parameterMenu(){
 	if [ "${WORKMODE}" != "In progress" ] && [ "${WORKMODE}" != "Image" ]
 	then
-		dialogMSG "You should extract image files before continue..."
+		dialogOK "You should extract image files before continue..."
 		return
 	fi
 
-	parameterFileSelect
+	if [ ${PARAMFILEPARSED} -eq 0 ]
+	then
+		parameterFileSelect
+	fi
 
 	if [ ${PARAMFILEPARSED} -eq 0 ]
 	then

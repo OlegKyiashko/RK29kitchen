@@ -6,7 +6,7 @@ MenuAdd "Resize system.img (/system partition)" "resizeSystemMenu"
 resizeSystemProcess(){
 	sz=$1
 	sz=$[${sz}-1]
-	ftype=`file ${WORKDIR}/Image/system.img`
+	ftype=`file Image/system.img`
 	fs="ext4"
 
 	dialogBT
@@ -36,32 +36,33 @@ resizeSystemProcess(){
 
 	dialogINF "Resizing in process. Please wait..."
 
-	pushd ${WORKDIR}/Image/ 2>> ${LOGFILE}
-	dd if=/dev/zero of=system.new bs=1M count=${sz} 2>> ${LOGFILE}
-	mkfs -t ${fs} -F -L system -m 0 system.new  2>> ${LOGFILE}
-	mkdir system0  2>> ${LOGFILE}
-	mkdir system1  2>> ${LOGFILE}
-	sudo mount system.img system0  2>> ${LOGFILE}
-	sudo mount system.new system1 2>> ${LOGFILE}
-	cd system0 2>> ${LOGFILE}
-	sudo tar cf - * | sudo tar xvf - -C ../system1 2>> ${LOGFILE}
+	pushd Image 2>> "${LOGFILE}"
+	dd if=/dev/zero of=system.new bs=1M count=${sz} 2>> "${LOGFILE}"
+	mkfs -t ${fs} -F -L system -m 0 system.new  2>> "${LOGFILE}"
+	mkdir system0  2>> "${LOGFILE}"
+	mkdir system1  2>> "${LOGFILE}"
+	sudo mount system.img system0  2>> "${LOGFILE}"
+	sudo mount system.new system1 2>> "${LOGFILE}"
+	cd system0 2>> "${LOGFILE}"
+	sudo tar cf - * | sudo tar xvf - -C ../system1 2>> "${LOGFILE}"
 	r=$?
+	cd ..
 	sudo sync
-	sudo umount -f system1 2>> ${LOGFILE}
-	sudo umount -f system0 2>> ${LOGFILE}
+	sudo umount -f system1 2>> "${LOGFILE}"
+	sudo umount -f system0 2>> "${LOGFILE}"
 	rm -rf system0 system1
 
 	if [ $r -ne 0 ]
 	then
-		dialogMSG "Resize process has errors"
+		dialogOK "Resize process has errors"
 		dialogBT
-		dialog --colors --backtitle "${DIALOGBT}" --title "Show log" --textbox "${LOGFILE}" 20 70
+		dialog --colors --backtitle "${DIALOGBT}" --title "Show log" --textbox ""${LOGFILE}"" 20 70
 	else
-		mv system.img system.img.bak  2>> ${LOGFILE}
-		mv system.new system.img  2>> ${LOGFILE}
+		mv system.img system.img.bak  2>> "${LOGFILE}"
+		mv system.new system.img  2>> "${LOGFILE}"
 	fi
 
-	popd 2>> ${LOGFILE}
+	popd 2>> "${LOGFILE}"
 }
 
 resizeSystemByParameter(){
@@ -89,7 +90,8 @@ resizeSystemByParameter(){
 }
 
 resizeSystemByValue(){
-	sz=`du -m ${WORKDIR}/Image/system.img|cut -f1`
+	sz=`stat -c%s Image/system.img`
+	sz=$[${sz}/1024/1024+1]
 	dialogBT
 	dialog --colors --backtitle "${DIALOGBT}" --title "Resize system.img (/system partition)" \
 		--inputbox "Set size of the \Z1system\Zn partition.\nOld size: ${sz}MB\nNew size (MB) (1MB will reserved):" 10 70 "$sz" 2> $tempfile
@@ -102,9 +104,9 @@ resizeSystemByValue(){
 }
 
 resizeSystemUpdateParameter(){
-	set -vx
-	sz=`du -m ${WORKDIR}/Image/system.img|cut -f1`
-	sz=$[${sz}+1]
+	sz=`stat -c%s Image/system.img`
+	sz=$[${sz}/1024/1024+1]
+
 	if [ ${PARAMFILEPARSED} -eq 0 ]
 	then    
 		parameterFileSelect
@@ -143,7 +145,7 @@ resizeSystemUpdateParameter(){
 resizeSystemMenu(){
 	if [ "${WORKMODE}" != "In progress" ] 22 [ "${WORKMODE}" != "Image" ]
 	then
-		dialogMSG "You should extract image files before continue..."
+		dialogOK "You should extract image files before continue..."
 		return
 	fi
 	while [ true ]
@@ -168,13 +170,13 @@ resizeSystemMenu(){
 					"U")
 						resizeSystemUpdateParameter
 						;;
-					*)
+					"X")
 						return
 						;;
 				esac
 				;;
 			*)
-				continue
+				return
 				;;
 		esac
 	done

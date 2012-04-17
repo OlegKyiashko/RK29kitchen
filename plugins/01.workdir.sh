@@ -6,7 +6,9 @@ WORKTYPE=99
 WORKMODE="Undefined"
 
 workdirTest(){
-	c=`ls -1 ${WORKDIR}/Image/zImage 2>/dev/null | wc -l `
+	cd "${WORKDIR}"
+
+	c=`ls -1 Image/zImage 2>/dev/null | wc -l `
 	if [ $c -eq 1 ]
 	then
 		WORKTYPE=2
@@ -14,7 +16,7 @@ workdirTest(){
 		return
 	fi
 
-	c=`ls -1 ${WORKDIR}/parameter ${WORKDIR}/parameter1G ${WORKDIR}/Image/*img ${WORKDIR}/RK29xx*bin 2>/dev/null | wc -l `
+	c=`ls -1 parameter parameter1G /Image/*img RK29xx*bin 2>/dev/null | wc -l `
 	if [ $c -gt 6 ]
 	then
 		WORKTYPE=1
@@ -22,7 +24,7 @@ workdirTest(){
 		return
 	fi
 
-	c=`ls -1 ${WORKDIR}/*img 2>/dev/null | wc -l `
+	c=`ls -1 *img 2>/dev/null | wc -l `
 	if [ $c -gt 0 ]
 	then
 		WORKTYPE=4
@@ -43,15 +45,15 @@ workdirSelect(){
 		dialog --colors --backtitle "${DIALOGBT}" --title "Choose work directory" --dselect "${WORKDIR}" 20 70 2> $tempfile
 		case $? in
 			0)
-				cd `cat $tempfile`
-				WORKDIR=`pwd`"/"
+				WORKDIR=`cat $tempfile`"/"
+				cd "${WORKDIR}"
 				workdirTest
 				case $WORKTYPE in
 					99)
 						dialogYN "Rom files not found. Exit?"
 						case $? in
 							0)
-								return	
+								exit 2
 								;;
 							*)
 								continue
@@ -65,7 +67,7 @@ workdirSelect(){
 				dialogYN "Workdir not selected. Exit?"
 				case $? in
 					0)
-						return	
+						exit 1
 						;;
 					*)
 						continue
