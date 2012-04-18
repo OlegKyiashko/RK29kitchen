@@ -70,10 +70,18 @@ makeUpdateMkInitRD(){
 	find . -exec touch -d "1970-01-01 01:00" {} \;
 	find . ! -name "."|sort|cpio -oa -H newc --owner=root:root|gzip -n >../${initrd}
 
-	cd ..	
-	abootimg --create boot.img -k $zimage -r ${initrd}
+	commonBackupFile "recovery-${initrd}"
+	commonBackupFile recovery.img
 
-	mkkrnlimg -r "${zimage}" kernel.img
+	cd ../recovery-$ramdisk
+	find . -exec touch -d "1970-01-01 01:00" {} \;
+	find . ! -name "."|sort|cpio -oa -H newc --owner=root:root|gzip -n >../recovery-${initrd}
+
+	cd ..
+	abootimg --create boot.img -f bootimg.cfg -k $zimage -r ${initrd}
+	abootimg --create recovery.img -f recovery.cfg -k $zimage -r recovery-${initrd}
+
+	mkkrnlimg -a "${zimage}" kernel.img
 
 	popd
 }
@@ -101,6 +109,7 @@ makeUpdateProcess(){
 }
 
 makeUpdateMain(){
+	cd "$WORKDIR"
 	case ${WORKMODE} in
 		"In progress")
 			makeUpdateProcess
