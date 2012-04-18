@@ -55,3 +55,9 @@ commonBackupFile(){
 	done
 }
 
+# first 4 bytes of file. 'ANDR' or 'KRNL' for android img files 
+commonFileSignature(){
+	fn=$1
+	sigSize=${2:-4}
+	COMMONFILESIGNATURE=`dd if="$1" bs=1 count=4`
+}

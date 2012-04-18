@@ -17,12 +17,12 @@ makeUpdateParseBL(){
 makeUpdateListBL(){
 	pushd "${BASEDIR}/plugins/bootloader"
 	n=0
-	
+
 	if [ ! -f "${BOOTLOADER}" ]
 	then
 		cp "${WORKDIR}/${BOOTLOADER}" .
 	fi
-	
+
 	for f in *bin
 	do
 		BL[$n]="\"$f\" \"\""
@@ -47,7 +47,7 @@ makeUpdateSelectBL(){
 				cp "${BASEDIR}/plugins/bootloader/$bl" "${WORKDIR}"
 			fi
 			commonBackupFile package-file
-			cat COMMONBACKUPFILE| sed -e "s/${BOOTLOADER}/${bl}/" > package-file
+			cat ${COMMONBACKUPFILE}| sed -e "s/${BOOTLOADER}/${bl}/" > package-file
 			;;
 	esac
 }

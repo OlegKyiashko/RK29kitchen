@@ -12,7 +12,8 @@ PARAMFILEPARSED=0
 parameterParse() {
 
 	MODEL=`grep MACHINE_MODEL ${PARAMFILE}|cut -d: -f2|tr -d "\n\r"`
-	CMDLINE=`grep CMDLINE ${PARAMFILE}|cut -d: -f2|tr -d "\n\r"`
+	CMDLINE=`grep CMDLINE ${PARAMFILE}|tr -d "\n\r"`
+	PARTS=`grep CMDLINE ${PARAMFILE}|cut -d: -f3|tr -d "\n\r"`
 
 	if [ -z "${CMDLINE}" ] || [ -z "${MODEL}" ]
 	then
@@ -58,7 +59,7 @@ parameterEdit(){
 		"${MODEL}"  "" "CUBE U9GT 2 "  "" "N90 " "" "LR97A01" "" 2> $tempfile
 	case $? in
 		0)
-			MODEL=`cat $tempfile`
+			NEWMODEL=`cat $tempfile`
 			;;
 	esac
 
@@ -76,6 +77,7 @@ parameterEdit(){
 	do
 		name=${SECTION[$n]}
 		ssize=${SSIZE[$n]}
+
 		if [ "$ssize" != '-' ]
 		then
 			if [ "$name" == "system" ] || [ "$name" == "cache" ] || [ "$name" == "userdata" ]
@@ -120,7 +122,8 @@ parameterMake(){
 		NEWCMDLINE=${NEWCMDLINE}$a
 	done
 	commonBackupFile "${PARAMFILE}"
-	echo -e ${HEADER}${NEWCMDLINE} |unix2dos>${PARAMFILE}
+#	echo -e ${HEADER}${NEWCMDLINE} |unix2dos>${PARAMFILE}
+	cat "${COMMONBACKUPFILE}"|sed -e "/MACHINE_MODEL/s|${MODEL}|${NEWMODEL}|" | sed -e "/CMDLINE/s|${CMDLINE}|${NEWCMDLINE}|" > "${PARAMFILE}"
 	diff -c ${PARAMFILE} ${COMMONBACKUPFILE} >${PARAMFILE}.patch
 }
 

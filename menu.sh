@@ -2,15 +2,18 @@
 set -vx 
 
 BASEDIR=`dirname $0`
-if [ "$BASEDIR" == '.' ]
-then
-	BASEDIR=`pwd`
-fi
+pushd "$BASEDIR"
+BASEDIR=`pwd`
+popd
 
 WORKDIR=${1:-`pwd`}
-if [ "$WORKDIR" == '.' ] || [ "${WORKDIR}" == "${BASEDIR}" ]
+pushd "$WORKDIR"
+WORKDIR=`pwd`"/"
+popd
+
+if [ "${WORKDIR}" == "${BASEDIR}" ]
 then
-	WORKDIR=`pwd`"/work/"
+	WORKDIR="${WORKDIR}/work/"
 fi
 
 BINDIR="${BASEDIR}/bin"

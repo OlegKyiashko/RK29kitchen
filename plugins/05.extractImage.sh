@@ -31,10 +31,20 @@ extractUmount(){
 }
 
 extractExtractFiles(){
+	pushd Image
+
 	mkdir -p $ramdisk
 	zcat $initrd | ( cd $ramdisk; cpio -idm )
 	sudo find $ramdisk -xtype f -print0|xargs -0 ls -ln --time-style="+%F %T" |sed -e "s/ ${ramdisk}/ /">_ramdisk.lst
 	sudo find $ramdisk -xtype f -print0|xargs -0 ls -ln --time-style="+" |sed -e "s/ ${ramdisk}/ /">_ramdisk.lst2
+
+	if [ -f recovery-$initrd ]
+	then
+		mkdir -p recovery-$ramdisk
+		zcat recovery-$initrd | ( cd recovery-$ramdisk; cpio -idm )
+		sudo find recovery-$ramdisk -xtype f -print0|xargs -0 ls -ln --time-style="+%F %T" |sed -e "s/ ${ramdisk}/ /">_recovery-ramdisk.lst
+		sudo find recovery-$ramdisk -xtype f -print0|xargs -0 ls -ln --time-style="+" |sed -e "s/ ${ramdisk}/ /">_recovery-ramdisk.lst2
+	fi
 
 	mkdir -p $system
 	sudo mount system.img $system
@@ -44,24 +54,84 @@ extractExtractFiles(){
 	#sudo umount system
 
 	strings ${zimage} |grep "Linux version" >_kernel.version
+	if [ -f recovery-$zimage ]
+	then
+		strings recovery-${zimage} |grep "Linux version" >_recovery-kernel.version
+	fi
+	popd
 }
 
-extractImage(){
+extractExtractBootImg(){
 	pushd Image
-
-	mkkrnlimg -r "boot.img" "${initrd}"
-	mkkrnlimg -r "kernel.img" "${zimage}"
-
-	extractExtractFiles
-
-	cp "${PLUGINS}"/extractImage/bootimg.cfg .
-
+	commonFileSignature boot.img
+	case $COMMONFILESIGNATURE in
+		"ANDR")
+			abootimg -i boot.img > _boot.info
+			abootimg -x boot.img
+			;;
+		"KRNL")
+			mkkrnlimg -r "boot.img" "${initrd}"
+			;;
+		*)
+			dialogOK "Unknown boot.img type :("
+			popd
+			exit 1
+	esac
 	popd
+}
+
+extractExtractKernelImg(){
+	if [ ! -f Image/kernel.img ]
+	then
+		return
+	fi
+
+	pushd Image
+	commonFileSignature kernel.img
+	case $COMMONFILESIGNATURE in
+		"KRNL")
+			mkkrnlimg -r kernel.img "${zimage}"
+			;;
+		*)
+			dialogOK "Unknown kernel.img type :("
+			popd
+			exit 1
+	esac
+	popd
+}
+
+extractExtractRecoveryImg(){
+	if [ ! -f Image/recovery.img ]
+	then
+		return
+	fi
+
+	pushd Image
+	commonFileSignature recovery.img
+	case $COMMONFILESIGNATURE in
+		"KRNL")
+			mkkrnlimg -r recovery.img recovery-$initrd
+			;;
+		"ANDR")
+			abootimg -i recovery.img > _recovery.info
+			abootimg -x recovery.img recovery.cfg recovery-${zimage} recovery-${initrd}
+			;;
+		*)
+			dialogOK "Unknown recovery.img type :("
+			popd
+			exit 1
+	esac
+	popd
+}
+
+
+extractExtractImage(){
+	cp "${PLUGINS}"/extractImage/bootimg.cfg Image/
 
 	cp "${PLUGINS}"/extractImage/package-file .
 	cp "${PLUGINS}"/extractImage/recover-script .
 	cp "${PLUGINS}"/extractImage/update-script .
-	
+
 	mv parameter1G parameter 2>/dev/null
 
 	BOOTLOADER=`grep bootloader package-file |cut -f2|tr -d "\n\r"`
@@ -69,14 +139,11 @@ extractImage(){
 	if [ "$BOOTLOADER" != "$bl" ]
 	then
 		commonBackupFile package-file
-		cat COMMONBACKUPFILE| sed -e "s/${BOOTLOADER}/${bl}/" > package-file
+		cat ${COMMONBACKUPFILE}| sed -e "s/${BOOTLOADER}/${bl}/" > package-file
 	fi
-
-	WORKTYPE=2
-	WORKMODE="In progress"
 }
 
-extractImgFileSelect(){
+extractExtractImg(){
 	while [ true ]
 	do
 		IMGFILE=""
@@ -88,6 +155,9 @@ extractImgFileSelect(){
 				if [ -f "$f" ]
 				then
 					IMGFILE=$f
+					img_unpack "${IMGFILE}" "${IMGFILE}.tmp"
+					afptool -unpack "${IMGFILE}.tmp" .
+					rm "${IMGFILE}.tmp"
 					return
 				fi
 				;;
@@ -104,37 +174,25 @@ extractImgFileSelect(){
 	done
 }
 
-extractImgFile(){
-
-	img_unpack "${IMGFILE}" "${IMGFILE}.tmp"
-
-	afptool -unpack "${IMGFILE}.tmp" .
-
-	rm "${IMGFILE}.tmp"
-
-	pushd Image
-
-	abootimg -i boot.img > _boot.info
-	abootimg -x boot.img
-
+extractExtractProcess(){
+	extractExtractBootImg
+	extractExtractKernelImg
+	extractExtractRecoveryImg
 	extractExtractFiles
-
-	popd
-
-	WORKTYPE=2
-	WORKMODE="In progress"
+	workdirTest
 }
 
 extractMain(){
+	cd "$WORKDIR"
+	workdirTest
 	case ${WORKMODE} in
 		"Image")
-			extractImage
-			workdirTest
+			extractExtractImage
+			extractExtractProcess
 			;;
 		"*img file")
-			extractImgFileSelect
-			extractImgFile
-			workdirTest
+			extractExtractImg
+			extractExtractProcess
 			;;
 		"In progress")
 			dialogOK "Files extracted some time ago :)"
