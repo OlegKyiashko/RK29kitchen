@@ -1,5 +1,5 @@
 #!/bin/bash
-№set -vx 
+#set -vx 
 
 BASEDIR=`dirname $0`
 pushd "$BASEDIR"
@@ -26,21 +26,9 @@ export BASEDIR WORKDIR BINDIR LOGFILE PATH tempfile PLUGINS
 
 trap "rm -f $tempfile" 0 1 2 5 15
 
-declare MENUITEM
-declare FUNCTION
-
 rm "${LOGFILE}"
 touch "${LOGFILE}"
 chmod +x "${BINDIR}/"*
-
-
-#1 - menu title; 2-function
-N=0
-MenuAdd() {
-	N=$[N+1]
-	MENUITEM[$N]="\"$N\" \"$1\""
-	FUNCTION[$N]="$2"
-}
 
 for file in `ls -1 "${PLUGINS}"/[0-9][0-9]\.*\.sh`
 do

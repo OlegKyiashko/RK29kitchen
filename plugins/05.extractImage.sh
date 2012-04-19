@@ -143,6 +143,13 @@ extractExtractImage(){
 	fi
 }
 
+extractExtractImgFile(){
+	IMGFILE=$1
+	img_unpack "${IMGFILE}" "${IMGFILE}.tmp"
+	afptool -unpack "${IMGFILE}.tmp" .
+	rm "${IMGFILE}.tmp"
+}
+
 extractExtractImg(){
 	while [ true ]
 	do
@@ -154,10 +161,7 @@ extractExtractImg(){
 				f=`cat $tempfile`
 				if [ -f "$f" ]
 				then
-					IMGFILE=$f
-					img_unpack "${IMGFILE}" "${IMGFILE}.tmp"
-					afptool -unpack "${IMGFILE}.tmp" .
-					rm "${IMGFILE}.tmp"
+					extractExtractImgFile $f
 					return
 				fi
 				;;

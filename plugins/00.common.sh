@@ -1,6 +1,16 @@
 #!/bin/bash
 #set -vx
 
+#1 - menu title; 2-function
+declare MENUITEM
+declare FUNCTION
+N=0
+MenuAdd() {
+	N=$[N+1]
+	MENUITEM[$N]="\"$N\" \"$1\""
+	FUNCTION[$N]="$2"
+}
+
 dialogBT(){
 	DIALOGBT="Work dir: \Z1${WORKDIR}\Zn Mode:\Z2${WORKMODE}\Zn Parameter file:\Z3${PARAMFILE}\Zn" 
 }

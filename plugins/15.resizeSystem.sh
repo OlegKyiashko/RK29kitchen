@@ -5,6 +5,35 @@ MenuAdd "Resize system.img (/system partition)" "resizeSystemMenu"
 
 resizeSystemProcess(){
 	sz=$1
+	fs=$2
+
+	pushd Image 2>> "${LOGFILE}"
+	dd if=/dev/zero of=system.new bs=1M count=${sz} 2>> "${LOGFILE}"
+	mkfs -t ${fs} -F -L system -m 0 system.new  2>> "${LOGFILE}"
+	mkdir system1  2>> "${LOGFILE}"
+	sudo mount system.new system1 2>> "${LOGFILE}"
+	cd system 2>> "${LOGFILE}"
+	sudo tar cf - * | sudo tar xvf - -C ../system1 2>> "${LOGFILE}"
+	r=$?
+	cd ..
+	sudo sync
+	sudo umount -f system1 2>> "${LOGFILE}"
+	sudo umount -f system 2>> "${LOGFILE}"
+	rm -rf system1
+
+	if [ $r -ne 0 ]
+	then
+		dialogLOG "Resize process has errors"
+	else
+		commonBackupFile system.img
+		mv system.new system.img  2>> "${LOGFILE}"
+	fi
+
+	popd 2>> "${LOGFILE}"
+}
+
+resizeSystemProcessDlg(){
+	sz=$1
 	sz=$[${sz}-1]
 	ftype=`file Image/system.img`
 	fs="ext4"
@@ -36,31 +65,7 @@ resizeSystemProcess(){
 
 	dialogINF "Resizing in process. Please wait..."
 
-	pushd Image 2>> "${LOGFILE}"
-	dd if=/dev/zero of=system.new bs=1M count=${sz} 2>> "${LOGFILE}"
-	mkfs -t ${fs} -F -L system -m 0 system.new  2>> "${LOGFILE}"
-	mkdir system0  2>> "${LOGFILE}"
-	mkdir system1  2>> "${LOGFILE}"
-	sudo mount system.img system0  2>> "${LOGFILE}"
-	sudo mount system.new system1 2>> "${LOGFILE}"
-	cd system0 2>> "${LOGFILE}"
-	sudo tar cf - * | sudo tar xvf - -C ../system1 2>> "${LOGFILE}"
-	r=$?
-	cd ..
-	sudo sync
-	sudo umount -f system1 2>> "${LOGFILE}"
-	sudo umount -f system0 2>> "${LOGFILE}"
-	rm -rf system0 system1
-
-	if [ $r -ne 0 ]
-	then
-		dialogLOG "Resize process has errors"
-	else
-		mv system.img system.img.bak  2>> "${LOGFILE}"
-		mv system.new system.img  2>> "${LOGFILE}"
-	fi
-
-	popd 2>> "${LOGFILE}"
+	resizeSystemProcess $sz $fs
 }
 
 resizeSystemByParameter(){
@@ -81,7 +86,7 @@ resizeSystemByParameter(){
 		if [ $name == "system" ]
 		then
 			bsize=$[$ssize/2048]
-			resizeSystemProcess ${bsize}
+			resizeSystemProcessDlg ${bsize}
 			break
 		fi
 	done
@@ -96,7 +101,7 @@ resizeSystemByValue(){
 	case $? in
 		0)
 			bsize=`cat $tempfile`
-			resizeSystemProcess ${bsize}
+			resizeSystemProcessDlg ${bsize}
 			;;
 	esac
 }

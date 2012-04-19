@@ -67,6 +67,21 @@ installSU(){
 	installEnd
 }
 
+installAllAPK(){
+	installBegin
+
+	pushd ${BASEDIR}/plugins/installApps/apk
+
+	for f in *apk
+	do
+		sudo cp "$f" "${WORKDIR}/Image/system/app/"  2>>"${LOGFILE}"
+	done
+
+	popd
+
+	installEnd
+}
+
 installAPK(){
 	installBegin
 

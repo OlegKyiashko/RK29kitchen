@@ -52,7 +52,7 @@ parameterParse() {
 	PARAMFILEPARSED=1
 }
 
-parameterEdit(){
+parameterEditDlg(){
 	dialogBT
 	dialog --colors --backtitle "${DIALOGBT}" --title "Edit parameter file"  \
 		--menu "Current MACHINE_MODEV value is \Z1${MODEL}\Zn\nNew value:" 20 70 10 \
@@ -100,11 +100,38 @@ parameterEdit(){
 	PARAMFILEPARSED=2
 }
 
-parameterMake(){
-	HEADER="FIRMWARE_VER:0.2.3\nMACHINE_MODEL:$MODEL \nMACHINE_ID:007\nMANUFACTURER:RK29SDK\nMAGIC: 0x5041524B\nATAG: 0x60000800\nMACHINE: 2929\nCHECK_MASK: 0x80\nKERNEL_IMG: 0x60408000\n"
-	NEWCMDLINE="CMDLINE: ${QUIET} console=ttyS1,115200n8n androidboot.console=ttyS1 init=/init initrd=0x62000000,0x800000 mtdparts=rk29xxnand:"
-	#0x00002000@0x00002000(misc),0x00004000@0x00004000(kernel),0x00008000@0x00008000(boot),0x00008000@0x00010000(recovery),0x00100000@0x00018000(backup),0x00002000@0x00118000(kpanic)"
+#args 1:model name 2: "quiet"|"" 3: system patition size in MB 4: cache size 5: userdata size
+parameterEdit(){
+	NEWMODEL=$1
+	QUIET=$2
 
+	for (( n=0; n<${#SECTION[@]}; n++ ))
+	do
+		name=${SECTION[$n]}
+		ssize=${SSIZE[$n]}
+		s=0
+		case $name in
+			"system")
+				s=$3
+				;;
+			"cache")
+				s=$4
+				;;
+			"userdata")
+				s=$5
+				;;
+		esac
+		if [ $s -ne 0 ]
+		then
+			s=$[$s*2048]
+			SSIZE[$n]=`printf 0x%08x $s`
+		fi
+	done
+
+
+}
+parameterMake(){
+	NEWCMDLINE="CMDLINE: ${QUIET} console=ttyS1,115200n8n androidboot.console=ttyS1 init=/init initrd=0x62000000,0x800000 mtdparts=rk29xxnand:"
 	sstart="0x00002000"
 	c=""
 	for (( n=0; n<${#SECTION[@]}; n++ ))
@@ -122,7 +149,6 @@ parameterMake(){
 		NEWCMDLINE=${NEWCMDLINE}$a
 	done
 	commonBackupFile "${PARAMFILE}"
-#	echo -e ${HEADER}${NEWCMDLINE} |unix2dos>${PARAMFILE}
 	cat "${COMMONBACKUPFILE}"|sed -e "/MACHINE_MODEL/s|${MODEL}|${NEWMODEL}|" | sed -e "/CMDLINE/s|${CMDLINE}|${NEWCMDLINE}|" > "${PARAMFILE}"
 	diff -c ${PARAMFILE} ${COMMONBACKUPFILE} >${PARAMFILE}.patch
 }
@@ -171,7 +197,7 @@ parameterMenu(){
 		return
 	fi
 
-	parameterEdit
+	parameterEditDlg
 
 	dialogYN "Save new ${PARAMETER} file?"
 	case $? in
