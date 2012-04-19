@@ -5,7 +5,7 @@
 mymodel="CUBE U9GT 2"
 myopt="quiet"
 mysystem=400
-mysystemfs="ext4"
+mysystemfs="ext3"
 mycache=64
 myuserdata=2048
 
