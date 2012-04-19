@@ -10,10 +10,10 @@ This software package may not meet your expectations.
 
 You can:
 - Unpack the firmware file consisting of one kind update.img (img mode, used RKBatchTool)
-- Unpack the firmware file consisting of a set RK29xxLoader.bin Image / boot.img Image / system.img etc (Image mode, used RKTool)
+- Unpack the firmware file consisting of a set RK29xxLoader.bin Image/boot.img Image/system.img etc (Image mode, used RKTool)
 - Change the name of the device and partition sizes (parameter file)
 - Install su and superuser (root access)
-- Install busybox in / system / xbin and create symlinks for the utilities that comes with busybox (like busybox pro)
+- Install busybox in /system/xbin and create symlinks for the utilities that comes with busybox (like busybox pro)
 - Choose and install some system applications
 - Change the file size system.img
 - Create update.img
@@ -36,6 +36,24 @@ Binary utilities (directory bin) can be compiled using:
 Dependences: libusb-1.0, libusb-1.0-devel, libssl, libssl-devel, dialog, sudo, gcc
 To work actively used sudo (must be set up password-less mode) - need to modify the partition system
 
+Use:
+[full_or_partial_path/]menu.sh [workdir]
+
+workdir may contain update.img (img mode) or set of files (Image mode)
+
+Select a Folder
+The directory-selection dialog displays a text-entry window in which you can type a directory, and above that a windows with directory names.
+The directory window will display the contents of the path and the text-entry window will contain the preselected directory.
+Use tab or arrow keys to move between the windows. Within the directory window, use the up / down arrow keys to scroll the current selection. Use the space-bar to copy the current selection into the text-entry window.
+Typing any printable characters switches focus to the text-entry window, entering that character as well as scrolling the directory window to the closest match.
+Use a carriage return or the "OK" button to accept the current value in the text-entry window and exit.
+
+Select File
+The file-selection dialog displays a text-entry window in which you can type a filename (or directory), and above that two windows with directory names and filenames.
+Use tab or arrow keys to move between the windows. Within the directory or filename windows, use the up / down arrow keys to scroll the current selection. Use the space-bar to copy the current selection into the text-entry window.
+Typing any printable characters switches focus to the text-entry window, entering that character as well as scrolling the directory and filename windows to the closest match.
+Typing the space character forces dialog to complete the current name (up to the point where there may be a match against more than one entry).
+Use a carriage return or the "OK" button to accept the current value in the text-entry window and exit.
 
 Russian:
 Этот пакет создан для автоматизации операций модификации прошивок для устройств на основе процессора РК2918.
@@ -72,3 +90,22 @@ TODO
 # make all install
 Зависимости: libusb-1.0, libusb-1.0-devel, libssl, libssl-devel, dialog, sudo, gcc
 Для работы активно используется sudo (должен быть настроен беспарольный режим) - необходим для модификации раздела system
+
+Использование:
+[full_or_partial_path/]menu.sh [WorkDir]
+
+WorkDir может содержать update.img (IMG режим) или набор файлов (Image режим)
+
+Select a Folder
+The directory-selection dialog displays a text-entry window in which you can type a directory, and above that a windows with directory names.
+The directory window will display the contents of the path and the text-entry window will contain the preselected directory.
+Use tab or arrow keys to move between the windows. Within the directory window, use the up / down arrow keys to scroll the current selection. Use the space-bar to copy the current selection into the text-entry window.
+Typing any printable characters switches focus to the text-entry window, entering that character as well as scrolling the directory window to the closest match.
+Use a carriage return or the "OK" button to accept the current value in the text-entry window and exit.
+
+Select File
+The file-selection dialog displays a text-entry window in which you can type a filename (or directory), and above that two windows with directory names and filenames.
+Use tab or arrow keys to move between the windows. Within the directory or filename windows, use the up / down arrow keys to scroll the current selection. Use the space-bar to copy the current selection into the text-entry window.
+Typing any printable characters switches focus to the text-entry window, entering that character as well as scrolling the directory and filename windows to the closest match.
+Typing the space character forces dialog to complete the current name (up to the point where there may be a match against more than one entry).
+Use a carriage return or the "OK" button to accept the current value in the text-entry window and exit.
