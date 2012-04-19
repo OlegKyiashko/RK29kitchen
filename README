@@ -25,7 +25,6 @@ also
 
 TODO
 - Plug-in to remove files from the "black list"
-- An example of an automated script
 
 Notes
 The package runs on Linux operating systems (development and testing on OpenSUSE 11.4/12.2)
@@ -38,6 +37,7 @@ To work actively used sudo (must be set up password-less mode) - need to modify 
 
 Use:
 [full_or_partial_path/]menu.sh [workdir]
+[full_or_partial_path/]batchImgRepack.sh [full_or_partial_path/]old.img
 
 workdir may contain update.img (img mode) or set of files (Image mode)
 
@@ -80,7 +80,6 @@ Russian:
 
 TODO
 - плагин для удаления файлов из "черного списка"
-- пример автоматизированного скрипта
 
 Заметки
 Пакет работает на операционных системах Linux (разработка и тестирование на OpenSUSE 11.4/12.2)
@@ -93,6 +92,7 @@ TODO
 
 Использование:
 [full_or_partial_path/]menu.sh [WorkDir]
+[full_or_partial_path/]batchImgRepack.sh [full_or_partial_path/]old.img
 
 WorkDir может содержать update.img (IMG режим) или набор файлов (Image режим)
 
