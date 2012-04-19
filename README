@@ -21,7 +21,7 @@ TODO
 - An example of an automated script
 
 Notes
-The package runs on operating systems, Linux (development and testing OpenSUSE 11.4/12.2)
+The package runs on Linux operating systems (development and testing on OpenSUSE 11.4/12.2)
 With the user interface is implemented using utilities 'dialog'
 Binary utilities (directory bin) can be compiled using:
 # cd src /
