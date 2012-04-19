@@ -101,6 +101,7 @@ makeUpdateImage(){
 	commonBackupFile ${img}
 	img_maker $BOOTLOADER ${img}.tmp ${img}
 	rm ${img}.tmp
+        zip update.zip update.img
 }
 
 makeUpdateProcess(){
