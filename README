@@ -1,5 +1,12 @@
+development and testing in progress!!!
+
 English:
 This package is designed to automate operations firmware update for the devices based on processor RK2918.
+
+Important!
+Use of this software package can cause damage to your device!
+This software package is supplied "as is" and without warranty.
+This software package may not meet your expectations.
 
 You can:
 - Unpack the firmware file consisting of one kind update.img (img mode, used RKBatchTool)
@@ -32,6 +39,11 @@ To work actively used sudo (must be set up password-less mode) - need to modify 
 
 Russian:
 Этот пакет создан для автоматизации операций модификации прошивок для устройств на основе процессора РК2918.
+
+Важно!
+Использование данного программного пакета может привести к повреждению вашего устройства!
+Данный программный пакет поставляется "как есть" и без каких либо гарантий.
+Данный программный пакет может не соответствовать вашим ожиданиям.
 
 Вы можете:
 - распаковывать прошивки состоящие из одного файла вида update.img (img mode, используется RKBatchTool)
