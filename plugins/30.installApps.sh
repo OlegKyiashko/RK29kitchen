@@ -33,16 +33,16 @@ installEnd(){
 	installFixDirPermissions system/xbin/ 0 0 0755
 	sudo chmod +s system/xbin/su
 	installFixDirPermissions system/app/ 0 0 0644
-	sudo umount -f system 2>>"${LOGFILE}"
+#	sudo umount -f system 2>>"${LOGFILE}"
 	popd
 }
 
 installBB(){
 	installBegin
 
-	sudo cp "${BASEDIR}/plugins/installApps/bin/busybox" system/xbin/busybox 2>>"${LOGFILE}"
+	sudo cp "${PLUGINS}/installApps/bin/busybox" system/xbin/busybox 2>>"${LOGFILE}"
 
-	for c in `cat "${BASEDIR}/plugins/installApps/bin/busybox.lst"`
+	for c in `cat "${PLUGINS}/installApps/bin/busybox.lst"`
 	do
 		dst="system/xbin/${c}"
 		if [ -f "$dst" ] || [ -L "$dst" ]
@@ -61,8 +61,8 @@ installSU(){
 	sudo mv system/bin/su "system/bin/su#" 2>/dev/null 
 	sudo mv system/xbin/su "system/xbin/su#" 2>/dev/null
 
-	sudo cp "${BASEDIR}/plugins/installApps/bin/su" system/xbin/su 2>>"${LOGFILE}"
-	sudo cp "${BASEDIR}/plugins/installApps/bin/Superuser.apk" system/app/ 2>>"${LOGFILE}"
+	sudo cp "${PLUGINS}/installApps/bin/su" system/xbin/su 2>>"${LOGFILE}"
+	sudo cp "${PLUGINS}/installApps/bin/Superuser.apk" system/app/ 2>>"${LOGFILE}"
 
 	installEnd
 }
@@ -70,7 +70,7 @@ installSU(){
 installAllAPK(){
 	installBegin
 
-	pushd ${BASEDIR}/plugins/installApps/apk
+	pushd "${PLUGINS}/installApps/apk"
 
 	for f in *apk
 	do
@@ -85,7 +85,7 @@ installAllAPK(){
 installAPK(){
 	installBegin
 
-	pushd ${BASEDIR}/plugins/installApps/apk
+	pushd "${PLUGINS}/installApps/apk"
 	n=0
 	for f in *apk
 	do

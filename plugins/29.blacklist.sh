@@ -4,20 +4,16 @@
 MenuAdd "Remove 'blacklist' files" "blacklistRemoveAll"
 
 blacklistRemoveAll(){
-	pushd "${WORKDIR}"
+	pushd "${WORKDIR}/Image"
 	sudo mount system.img system -o loop 2> /dev/null
-
-	for f in `cat "${PLUGINS}/blacklist/blacklist.txt"`
+        d=`pwd`
+	for f in `cat "${PLUGINS}/blacklist/blacklist.txt"|grep -v "^ *#"`
 	do
-                if [[ $f =~ "^ *#" ]]
-                then
-                        continue
-                fi
-       		echo rm -f "Image/$f"  >>"${LOGFILE}"
-        	sudo rm -f "Image/$f"  2>>"${LOGFILE}"
+       		echo rm -f "$d/$f"  >>"${LOGFILE}"
+        	sudo rm -f "$d/$f"  2>>"${LOGFILE}"
 	done
 	popd
 
-        dialogOK "Partition system is cleaned"
+        echo "Partition system is cleaned"
 }
 

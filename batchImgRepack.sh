@@ -78,9 +78,17 @@ parameterMake
 
 resizeSystemProcess $[$mysystem-1] "$mysystemfs"
 
+blacklistRemoveAll
+
 installSU
 installBB
 installAllAPK
 
-makeUpdateProcess
-
+echo You can make changes manually now.
+echo -n Make update.img y/n [y]?
+read a
+case "$a" in
+        "y"|"Y"|"")
+                makeUpdateProcess
+                ;;
+esac

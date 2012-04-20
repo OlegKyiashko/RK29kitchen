@@ -60,13 +60,13 @@ makeUpdateBL(){
 }
 
 makeUpdateMkInitRD(){
-	#mkinitrd
 	pushd "${WORKDIR}/Image/"
 
 	commonBackupFile "${initrd}"
 	commonBackupFile boot.img
 
 	cd $ramdisk
+        find . -type f -name "*#" -print0 | xargs -0 sudo rm -f 
 	find . -exec touch -d "1970-01-01 01:00" {} \;
 	find . ! -name "."|sort|cpio -oa -H newc --owner=root:root|gzip -n >../${initrd}
 
@@ -74,6 +74,7 @@ makeUpdateMkInitRD(){
 	commonBackupFile recovery.img
 
 	cd ../recovery-$ramdisk
+        find . -type f -name "*#" -print0 | xargs -0 sudo rm -f 
 	find . -exec touch -d "1970-01-01 01:00" {} \;
 	find . ! -name "."|sort|cpio -oa -H newc --owner=root:root|gzip -n >../recovery-${initrd}
 
@@ -88,6 +89,11 @@ makeUpdateMkInitRD(){
 
 makeUpdateImage(){
 	cd "${WORKDIR}"
+
+        cd Image
+        sudo umount -f system
+        cd ..
+
 	if [ -z "${BOOTLOADER}" ]
 	then
 		makeUpdateParseBL
@@ -98,6 +104,7 @@ makeUpdateImage(){
 		dialogLOG "Make update image error"
 		exit 1
 	fi
+
 	commonBackupFile ${img}
 	img_maker $BOOTLOADER ${img}.tmp ${img}
 	rm ${img}.tmp

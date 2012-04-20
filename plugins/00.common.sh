@@ -1,6 +1,9 @@
 #!/bin/bash
 #set -vx
 
+TZ=UTC
+export TZ
+
 #1 - menu title; 2-function
 declare MENUITEM
 declare FUNCTION

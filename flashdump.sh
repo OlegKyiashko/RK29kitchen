@@ -4,6 +4,8 @@ BASEDIR=`basedir $0`
 PATH=$BASEDIR/bin:$PATH
 export PATH
 
+echo Check that your tablet is in the firmware flash mode and connected to computer
+
 sudo rkflashtool r 0 1 >parm
 mkkrnlimg -r parm parameter
 PARAMFILE="parameter"
