@@ -22,9 +22,10 @@ also
 - Create their own plug-ins
 - To create automated scripts based on an existing plugin library
 - Modify the list of proposed system applications
+- Plug-in to remove files from the "black list"
 
 TODO
-- Plug-in to remove files from the "black list"
+- build.prop fixes
 
 Notes
 The package runs on Linux operating systems (development and testing on OpenSUSE 11.4/12.2)
@@ -77,9 +78,10 @@ Russian:
 - создавать свои плагины
 - создавать  автоматизированные скрипты на основе существующей библиотеки плагинов
 - изменять список предлагаемых системных приложений
+- плагин для удаления файлов из "черного списка"
 
 TODO
-- плагин для удаления файлов из "черного списка"
+- build.prop
 
 Заметки
 Пакет работает на операционных системах Linux (разработка и тестирование на OpenSUSE 11.4/12.2)
