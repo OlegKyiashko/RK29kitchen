@@ -55,7 +55,7 @@ do
 done
 
 cd "${WORKDIR}"
-workdirTest
+workdir_Test
 if [ ${WORKTYPE} -ne 4 ]
 then
 	usage
@@ -63,26 +63,24 @@ then
 fi
 
 #unpack img
-extractExtractImgFile $1
-extractExtractProcess
+extractImage_ExtractImgFile $1
+extractImage_ExtractProcess
 
 #parse && edit parameter file
 PARAMFILE="parameter"
-parameterParse
+parameter_Parse
 if [ ${PARAMFILEPARSED} -ne 1 ]
 then
 	return
 fi
-parameterEdit "$mymodel" "$myopt" $mysystem $mycache $myuserdata
-parameterMake
+parameter_Edit "$mymodel" "$myopt" $mysystem $mycache $myuserdata
+parameter_Make
 
-resizeSystemProcess $[$mysystem-1] "$mysystemfs"
+resizeSystem_Process $[$mysystem-1] "$mysystemfs"
 
-blacklistRemoveAll
-
-installSU
-installBB
-installAllAPK
+installApps_SU
+installApps_BB
+installApps_AllAPK
 
 echo You can make changes manually now.
 echo -n Make update.img y/n [y]?

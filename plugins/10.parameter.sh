@@ -1,15 +1,15 @@
 #!/bin/bash
 #set -vx
 
-MenuAdd "Select parameter file" "parameterFileSelect"
-MenuAdd "Edit parameter file" "parameterMenu"
+MenuAdd "Select parameter file" "parameter_FileSelect"
+MenuAdd "Edit parameter file" "parameter_Menu"
 
 declare SECTION
 declare SSIZE
 MODEL="CUBE U9GT 2"
 PARAMFILEPARSED=0
 
-parameterParse() {
+parameter_Parse() {
 
 	MODEL=`grep MACHINE_MODEL ${PARAMFILE}|cut -d: -f2|tr -d "\n\r"`
 	CMDLINE=`grep CMDLINE ${PARAMFILE}|tr -d "\n\r"`
@@ -52,7 +52,7 @@ parameterParse() {
 	PARAMFILEPARSED=1
 }
 
-parameterEditDlg(){
+parameter_EditDlg(){
 	dialogBT
 	dialog --colors --backtitle "${DIALOGBT}" --title "Edit parameter file"  \
 		--menu "Current MACHINE_MODEV value is \Z1${MODEL}\Zn\nNew value:" 20 70 10 \
@@ -101,7 +101,7 @@ parameterEditDlg(){
 }
 
 #args 1:model name 2: "quiet"|"" 3: system patition size in MB 4: cache size 5: userdata size
-parameterEdit(){
+parameter_Edit(){
 	NEWMODEL=$1
 	QUIET=$2
 
@@ -130,7 +130,7 @@ parameterEdit(){
 
 
 }
-parameterMake(){
+parameter_Make(){
 	NEWCMDLINE="CMDLINE: ${QUIET} console=ttyS1,115200n8n androidboot.console=ttyS1 init=/init initrd=0x62000000,0x800000 mtdparts=rk29xxnand:"
 	sstart="0x00002000"
 	c=""
@@ -148,12 +148,12 @@ parameterMake(){
 		fi
 		NEWCMDLINE=${NEWCMDLINE}$a
 	done
-	commonBackupFile "${PARAMFILE}"
+	BackupFile "${PARAMFILE}"
 	cat "${COMMONBACKUPFILE}"|sed -e "/MACHINE_MODEL/s|${MODEL}|${NEWMODEL}|" | sed -e "/CMDLINE/s|${CMDLINE}|${NEWCMDLINE}|" > "${PARAMFILE}"
 	diff -c ${PARAMFILE} ${COMMONBACKUPFILE} >${PARAMFILE}.patch
 }
 
-parameterFileSelect(){
+parameter_FileSelect(){
 	while [ true ]
 	do
 		dialogBT
@@ -161,7 +161,7 @@ parameterFileSelect(){
 		case $? in
 			0)
 				PARAMFILE=`cat $tempfile`
-				parameterParse
+				parameter_Parse
 				;;
 		esac
 		if [ ${PARAMFILEPARSED} -ne 0 ]
@@ -180,7 +180,7 @@ parameterFileSelect(){
 	done
 }
 
-parameterMenu(){
+parameter_Menu(){
 	if [ "${WORKMODE}" != "In progress" ] && [ "${WORKMODE}" != "Image" ]
 	then
 		dialogOK "You should extract image files before continue..."
@@ -189,7 +189,7 @@ parameterMenu(){
 
 	if [ ${PARAMFILEPARSED} -eq 0 ]
 	then
-		parameterFileSelect
+		parameter_FileSelect
 	fi
 
 	if [ ${PARAMFILEPARSED} -eq 0 ]
@@ -197,12 +197,12 @@ parameterMenu(){
 		return
 	fi
 
-	parameterEditDlg
+	parameter_EditDlg
 
 	dialogYN "Save new ${PARAMETER} file?"
 	case $? in
 		0)
-			parameterMake
+			parameter_Make
 			;;
 		*)
 			PARAMFILEPARSED=0

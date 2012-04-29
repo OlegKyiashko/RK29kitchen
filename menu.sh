@@ -1,5 +1,5 @@
 #!/bin/bash
-#set -vx 
+set -vx 
 
 BASEDIR=`dirname $0`
 pushd "$BASEDIR"
@@ -20,35 +20,34 @@ BINDIR="${BASEDIR}/bin"
 LOGFILE="${BASEDIR}/log"
 PLUGINS="${BASEDIR}/plugins"
 PATH="${BINDIR}":$PATH
-tempfile=`mktemp 2>/dev/null` || tempfile=/tmp/rk29$$
 
-export BASEDIR WORKDIR BINDIR LOGFILE PATH tempfile PLUGINS
-
-trap "rm -f $tempfile" 0 1 2 5 15
+export BASEDIR WORKDIR BINDIR LOGFILE PATH PLUGINS
 
 rm "${LOGFILE}"
 touch "${LOGFILE}"
 chmod +x "${BINDIR}/"*
 
-for file in `ls -1 "${PLUGINS}"/[0-9][0-9]\.*\.sh`
+pushd "${PLUGINS}"
+for file in `ls -1 [0-9][0-9]\.*\.sh`
 do
         chmod +x $file
 	source $file
 done
+popd
 
 MenuAdd "Exit" "exit 0"
 
 cd "${WORKDIR}"
-workdirTest
+workdir_Test
 if [ ${WORKTYPE} -eq 99 ]
 then
-	workdirSelect
+	workdir_Select
 fi
 
 while [ true ]
 do
 	dialogBT
-	echo ${MENUITEM[@]}|xargs dialog --colors --backtitle "${DIALOGBT}" --title 'RK29xx toolkit' --menu "Select command" 20 70 15 2> $tempfile
+	echo $MENUITEMS|xargs dialog --colors --backtitle "${DIALOGBT}" --title 'RK29xx toolkit' --menu "Select command" 20 70 15 2> $tempfile
 	case $? in
 		0)
 			s=`cat $tempfile`

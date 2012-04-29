@@ -1,9 +1,9 @@
 #!/bin/bash
 #set -vx
 
-MenuAdd "Resize system.img (/system partition)" "resizeSystemMenu"
+MenuAdd "Resize system.img (/system partition)" "resizeSystem_Menu"
 
-resizeSystemProcess(){
+resizeSystem_Process(){
 	sz=$1
 	fs=$2
 
@@ -25,14 +25,14 @@ resizeSystemProcess(){
 	then
 		dialogLOG "Resize process has errors"
 	else
-		commonBackupFile system.img
+		BackupFile system.img
 		mv system.new system.img  2>> "${LOGFILE}"
 	fi
 
 	popd 2>> "${LOGFILE}"
 }
 
-resizeSystemProcessDlg(){
+resizeSystem_ProcessDlg(){
 	sz=$1
 	sz=$[${sz}-1]
 	ftype=`file Image/system.img`
@@ -65,13 +65,13 @@ resizeSystemProcessDlg(){
 
 	dialogINF "Resizing in process. Please wait..."
 
-	resizeSystemProcess $sz $fs
+	resizeSystem_Process $sz $fs
 }
 
-resizeSystemByParameter(){
+resizeSystem_ByParameter(){
 	if [ ${PARAMFILEPARSED} -eq 0 ]
 	then
-		parameterFileSelect
+		parameter_FileSelect
 	fi
 
 	if [ ${PARAMFILEPARSED} -eq 0 ]
@@ -86,13 +86,13 @@ resizeSystemByParameter(){
 		if [ $name == "system" ]
 		then
 			bsize=$[$ssize/2048]
-			resizeSystemProcessDlg ${bsize}
+			resizeSystem_ProcessDlg ${bsize}
 			break
 		fi
 	done
 }
 
-resizeSystemByValue(){
+resizeSystem_ByValue(){
 	sz=`stat -c%s Image/system.img`
 	sz=$[${sz}/1024/1024+1]
 	dialogBT
@@ -101,18 +101,18 @@ resizeSystemByValue(){
 	case $? in
 		0)
 			bsize=`cat $tempfile`
-			resizeSystemProcessDlg ${bsize}
+			resizeSystem_ProcessDlg ${bsize}
 			;;
 	esac
 }
 
-resizeSystemUpdateParameter(){
+resizeSystem_UpdateParameter(){
 	sz=`stat -c%s Image/system.img`
 	sz=$[${sz}/1024/1024+1]
 
 	if [ ${PARAMFILEPARSED} -eq 0 ]
 	then    
-		parameterFileSelect
+		parameter_FileSelect
 	fi      
 
 	if [ ${PARAMFILEPARSED} -eq 0 ]
@@ -135,7 +135,7 @@ resizeSystemUpdateParameter(){
 	dialogYN "Save new ${PARAMETER} file?"
 	case $? in
 		0)
-			parameterMake
+			parameter_Make
 			;;
 		*)
 			PARAMFILEPARSED=0
@@ -145,7 +145,7 @@ resizeSystemUpdateParameter(){
 
 }
 
-resizeSystemMenu(){
+resizeSystem_Menu(){
 	if [ "${WORKMODE}" != "In progress" ] 22 [ "${WORKMODE}" != "Image" ]
 	then
 		dialogOK "You should extract image files before continue..."
@@ -165,13 +165,13 @@ resizeSystemMenu(){
 				s=`cat $tempfile`
 				case $s in
 					"P")
-						resizeSystemByParameter
+						resizeSystem_ByParameter
 						;;
 					"S")
-						resizeSystemByValue
+						resizeSystem_ByValue
 						;;
 					"U")
-						resizeSystemUpdateParameter
+						resizeSystem_UpdateParameter
 						;;
 					"X")
 						return

@@ -1,11 +1,11 @@
 #!/bin/bash
 #set -vx
 
-MenuAdd "Select work directory" "workdirSelect"
+MenuAdd "Select work directory" "workdir_Select"
 WORKTYPE=99
 WORKMODE="Undefined"
 
-workdirTest(){
+workdir_Test(){
 	cd "${WORKDIR}"
 
 	c=`ls -1 Image/zImage 2>/dev/null | wc -l `
@@ -38,7 +38,7 @@ workdirTest(){
 	return
 }
 
-workdirSelect(){
+workdir_Select(){
 	while [ true ]
 	do
 		dialogBT
@@ -47,7 +47,7 @@ workdirSelect(){
 			0)
 				WORKDIR=`cat $tempfile`"/"
 				cd "${WORKDIR}"
-				workdirTest
+				workdir_Test
 				case $WORKTYPE in
 					99)
 						dialogYN "Rom files not found. Exit?"

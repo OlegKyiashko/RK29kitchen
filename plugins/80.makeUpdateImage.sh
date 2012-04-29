@@ -1,8 +1,8 @@
 #!/bin/bash
 #set -vx
 
-MenuAdd "Change bootloader" "makeUpdateBL"
-MenuAdd "Make update.img image file" "makeUpdateMain"
+MenuAdd "Change bootloader" "makeUpdateImage_BL"
+MenuAdd "Make update.img image file" "makeUpdateImage_Main"
 
 initrd='initrd.img'
 ramdisk='ramdisk'
@@ -10,11 +10,11 @@ system='system'
 zimage='zImage'
 img='update.img'
 
-makeUpdateParseBL(){
+makeUpdateImage_ParseBL(){
 	BOOTLOADER=`grep bootloader package-file |cut -f2|tr -d "\n\r"`
 }
 
-makeUpdateListBL(){
+makeUpdateImage_ListBL(){
 	pushd "${BASEDIR}/plugins/bootloader"
 	n=0
 
@@ -23,16 +23,17 @@ makeUpdateListBL(){
 		cp "${WORKDIR}/${BOOTLOADER}" .
 	fi
 
-	for f in *bin
+	DirToArray "*bin"
+	BL=""
+	for (( i=0; i<${#FILEARRAY[@]}; i++ ))
 	do
-		BL[$n]="\"$f\" \"\""
-		n=$[n+1]
+		BL="$BL \"${FILEARRAY[i]}\" \"\""
 	done
 	BL[$n]="\"Exit\" \"\""
 	popd
 }
 
-makeUpdateSelectBL(){
+makeUpdateImage_SelectBL(){
 	echo ${BL[@]}| xargs dialog --colors --backtitle "${DIALOGBT}" --title "Change bootloader" \
 	  --menu "Current bootloader: $BOOTLOADER\nChoose bootloader:" 20 70 15 2>$tempfile
 	case $? in
@@ -46,32 +47,32 @@ makeUpdateSelectBL(){
 			then
 				cp "${BASEDIR}/plugins/bootloader/$bl" "${WORKDIR}"
 			fi
-			commonBackupFile package-file
+			BackupFile package-file
 			cat ${COMMONBACKUPFILE}| sed -e "s/${BOOTLOADER}/${bl}/" > package-file
 			;;
 	esac
 }
 
-makeUpdateBL(){
+makeUpdateImage_BL(){
 	cd "${WORKDIR}"
-	makeUpdateParseBL
-	makeUpdateListBL
-	makeUpdateSelectBL
+	makeUpdateImage_ParseBL
+	makeUpdateImage_ListBL
+	makeUpdateImage_SelectBL
 }
 
-makeUpdateMkInitRD(){
+makeUpdateImage_MkInitRD(){
 	pushd "${WORKDIR}/Image/"
 
-	commonBackupFile "${initrd}"
-	commonBackupFile boot.img
+	BackupFile "${initrd}"
+	BackupFile boot.img
 
 	cd $ramdisk
         find . -type f -name "*#" -print0 | xargs -0 sudo rm -f 
 	find . -exec touch -d "1970-01-01 01:00" {} \;
 	find . ! -name "."|sort|cpio -oa -H newc --owner=root:root|gzip -n >../${initrd}
 
-	commonBackupFile "recovery-${initrd}"
-	commonBackupFile recovery.img
+	BackupFile "recovery-${initrd}"
+	BackupFile recovery.img
 
 	cd ../recovery-$ramdisk
         find . -type f -name "*#" -print0 | xargs -0 sudo rm -f 
@@ -87,7 +88,7 @@ makeUpdateMkInitRD(){
 	popd
 }
 
-makeUpdateImage(){
+makeUpdateImage_Image(){
 	cd "${WORKDIR}"
 
         cd Image
@@ -96,7 +97,7 @@ makeUpdateImage(){
 
 	if [ -z "${BOOTLOADER}" ]
 	then
-		makeUpdateParseBL
+		makeUpdateImage_ParseBL
 	fi
 	afptool -pack . ${img}.tmp 2>>"${LOGFILE}"
 	if [ ! -f "${img}.tmp" ]
@@ -105,25 +106,26 @@ makeUpdateImage(){
 		exit 1
 	fi
 
-	commonBackupFile ${img}
+	BackupFile ${img}
 	img_maker $BOOTLOADER ${img}.tmp ${img}
 	rm ${img}.tmp
         zip update.zip update.img
 }
 
-makeUpdateProcess(){
-	makeUpdateMkInitRD
-	makeUpdateImage
+makeUpdateImage_Process(){
+	makeUpdateImage_MkInitRD
+	makeUpdateImage_Image
 }
 
-makeUpdateMain(){
+makeUpdateImage_Main(){
 	cd "$WORKDIR"
 	case ${WORKMODE} in
 		"In progress")
-			makeUpdateProcess
+			makeUpdateImage_Process
 			;;
 		*)
 			dialogOK "Mode unsupported now!"
 			;;
 	esac
 }
+

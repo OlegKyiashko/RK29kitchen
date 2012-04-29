@@ -1,16 +1,16 @@
 #!/bin/bash
 #set -vx
 
-MenuAdd "Extract image files" "extractMain"
-MenuAdd "Mount /system to Image/system" "extractMount"
-MenuAdd "Umount /system from Image/system" "extractUmount"
+MenuAdd "Extract image files" "extractImage_Main"
+MenuAdd "Mount /system to Image/system" "extractImage_Mount"
+MenuAdd "Umount /system from Image/system" "extractImage_Umount"
 
 initrd='initrd.img'
 ramdisk='ramdisk'
 system='system'
 zimage='zImage'
 
-extractMount(){
+extractImage_Mount(){
 	sudo mount "${WORKDIR}/Image/system.img" "${WORKDIR}/Image/$system"
 	if [ $? -eq 0 ]
 	then
@@ -20,7 +20,7 @@ extractMount(){
 	fi		
 }
 
-extractUmount(){
+extractImage_Umount(){
 	sudo umount -f "${WORKDIR}/Image/$system"
 	if [ $? -eq 0 ]
 	then
@@ -30,7 +30,7 @@ extractUmount(){
 	fi		
 }
 
-extractExtractFiles(){
+extractImage_ExtractFiles(){
 	pushd Image
 
 	mkdir -p $ramdisk
@@ -61,9 +61,9 @@ extractExtractFiles(){
 	popd
 }
 
-extractExtractBootImg(){
+extractImage_ExtractBootImg(){
 	pushd Image
-	commonFileSignature boot.img
+	FileSignature boot.img
 	case $COMMONFILESIGNATURE in
 		"ANDR")
 			abootimg -i boot.img > _boot.info
@@ -80,14 +80,14 @@ extractExtractBootImg(){
 	popd
 }
 
-extractExtractKernelImg(){
+extractImage_ExtractKernelImg(){
 	if [ ! -f Image/kernel.img ]
 	then
 		return
 	fi
 
 	pushd Image
-	commonFileSignature kernel.img
+	FileSignature kernel.img
 	case $COMMONFILESIGNATURE in
 		"KRNL")
 			mkkrnlimg -r kernel.img "${zimage}"
@@ -100,14 +100,14 @@ extractExtractKernelImg(){
 	popd
 }
 
-extractExtractRecoveryImg(){
+extractImage_ExtractRecoveryImg(){
 	if [ ! -f Image/recovery.img ]
 	then
 		return
 	fi
 
 	pushd Image
-	commonFileSignature recovery.img
+	FileSignature recovery.img
 	case $COMMONFILESIGNATURE in
 		"KRNL")
 			mkkrnlimg -r recovery.img recovery-$initrd
@@ -125,7 +125,7 @@ extractExtractRecoveryImg(){
 }
 
 
-extractExtractImage(){
+extractImage_ExtractImage(){
 	cp "${PLUGINS}"/extractImage/bootimg.cfg Image/
 
 	cp "${PLUGINS}"/extractImage/package-file .
@@ -138,30 +138,31 @@ extractExtractImage(){
 	bl=`ls -1 RK29*bin`
 	if [ "$BOOTLOADER" != "$bl" ]
 	then
-		commonBackupFile package-file
+		BackupFile package-file
 		cat ${COMMONBACKUPFILE}| sed -e "s/${BOOTLOADER}/${bl}/" > package-file
 	fi
+	extractImage_ExtractProcess
 }
 
-extractExtractImgFile(){
+extractImage_ExtractImgFile(){
 	IMGFILE=$1
 	img_unpack "${IMGFILE}" "${IMGFILE}.tmp"
 	afptool -unpack "${IMGFILE}.tmp" .
 	rm "${IMGFILE}.tmp"
 }
 
-extractExtractImg(){
+extractImage_ExtractImg(){
 	while [ true ]
 	do
 		IMGFILE=""
-		dialogBT
-		dialog --colors --backtitle "${DIALOGBT}" --title "Choose img file" --fselect "${WORKDIR}" 20 70 2>$tempfile
+		FilesMenuDlg "*.img" "Extract image files" "Choose img file"
 		case $? in
 			0)
 				f=`cat $tempfile`
 				if [ -f "$f" ]
 				then
-					extractExtractImgFile $f
+					extractImage_ExtractImgFile $f
+					extractImage_ExtractProcess
 					return
 				fi
 				;;
@@ -178,25 +179,23 @@ extractExtractImg(){
 	done
 }
 
-extractExtractProcess(){
-	extractExtractBootImg
-	extractExtractKernelImg
-	extractExtractRecoveryImg
-	extractExtractFiles
-	workdirTest
+extractImage_ExtractProcess(){
+	extractImage_ExtractBootImg
+	extractImage_ExtractKernelImg
+	extractImage_ExtractRecoveryImg
+	extractImage_ExtractFiles
+	workdir_Test
 }
 
-extractMain(){
+extractImage_Main(){
 	cd "$WORKDIR"
-	workdirTest
+	workdir_Test
 	case ${WORKMODE} in
 		"Image")
-			extractExtractImage
-			extractExtractProcess
+			extractImage_ExtractImage
 			;;
 		"*img file")
-			extractExtractImg
-			extractExtractProcess
+			extractImage_ExtractImg
 			;;
 		"In progress")
 			dialogOK "Files extracted some time ago :)"
