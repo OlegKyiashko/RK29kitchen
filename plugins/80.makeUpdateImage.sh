@@ -92,7 +92,9 @@ makeUpdateImage_Image(){
 	cd "${WORKDIR}"
 
         cd Image
+        sudo sync
         sudo umount -f system
+	sudo /sbin/fsck.ext3 -pf system.img
         cd ..
 
 	if [ -z "${BOOTLOADER}" ]

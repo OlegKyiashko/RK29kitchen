@@ -1,7 +1,7 @@
 #!/bin/bash
 #set -vx
 
-MenuAdd "Install system apps" "installApps_Menu"
+MenuAdd "System apps" "installApps_Menu"
 installApps_Begin(){
 	pushd Image  2>/dev/null
 	sudo mount system.img system -o loop 2>>"${LOGFILE}"
@@ -78,19 +78,24 @@ installApps_RemoveListApk(){
 	for (( i=0; i<${apklistsize}; i++ ))
 	do
 		f=${apklist[$i]}
+		if [ -z "$f" ]
+		then
+			continue
+		fi
 		ApkLibExtract "$f"
 		if [ ! -z "${APKLIBFILES}" ]
 		then
 			pushd "${APKLIBDIR}" 2>/dev/null
 			DirToArray "*.so"
+			popd 2>/dev/null
 			s=${#FILEARRAY[@]}
 			for (( j=0; j<${s}; j++ ))
 			do
-				so=${FILEARRAY[$i]}
-				sudo rm "${WORKDIR}/Image/system/lib/$so" 2>>"${LOGFILE}"
+				so="${FILEARRAY[$j]}"
+				sudo rm "${WORKDIR}/Image/system//lib/$so" 2>>"${LOGFILE}"
 			done
-			popd 2>/dev/null
 		fi
+		sudo rm "${WORKDIR}/Image/system/app/$f" 2>>"${LOGFILE}"
 	done
 	popd
 
@@ -129,24 +134,26 @@ installApps_RemoveSelectedApk(){
 installApps_InstallListApk(){
 	installApps_Begin
 	apklist=("${!1}")
+	pushd "${PLUGINS}/installApps/apk"
 	apklistsize=${#apklist[@]}
 	for (( i=0; i<${apklistsize}; i++ ))
 	do
 		f=${apklist[$i]}
 		sudo cp $f "${WORKDIR}/Image/system/app/"  2>>"${LOGFILE}"
 	done
+	popd
 	installApps_ExtractSystemLibs
 	installApps_End
 }
 
-installApps_InstallAllAPK(){
+installApps_InstallAllApk(){
 	pushd "${PLUGINS}/installApps/apk"
 	DirToArray "*apk"
 	installApps_InstallListApk FILEARRAY[@]
 	popd
 }
 
-installApps_InstallSelectedAPK(){
+installApps_InstallSelectedApk(){
 	pushd "${PLUGINS}/installApps/apk"
 	DirToArray "*apk"
 	ListCheckboxDlg FILEARRAY[@] "" "Install apps as system" "Choose apk files:"
@@ -184,10 +191,10 @@ installApps_Menu(){
 						installApps_SU
 						;;
 					"clean")
-						installApps_RemoveSelectedAPK
+						installApps_RemoveSelectedApk
 						;;
 					"apk")
-						installApps_InstallSelectedAPK
+						installApps_InstallSelectedApk
 						;;
 					"X")
 						return

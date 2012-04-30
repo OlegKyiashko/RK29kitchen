@@ -95,16 +95,22 @@ SetDirPermissions(){
 }
 
 SetFilePermissions(){
-	fn=$1
-	uid=$2
-	gid=$3
-	mod=$4
+	fn="$1"
+	uid="$2"
+	gid="$3"
+	mod="$4"
 	sudo chmod ${mod} "$fn" 2>>"${LOGFILE}"
 	sudo chown ${uid}:${gid} "$fn" 2>>"${LOGFILE}"
 }
 
 ApkLibExtract(){
-	apk=$1
+	apk="$1"
+	APKLIBDIR=""
+	APKLIBFILES=""
+	if [ -z "$apk" ]
+	then
+		return
+	fi
 	APKLIBDIR="$tempdir/$apk/"
 	unzip "$apk" -d "$APKLIBDIR" "*.so"
 	pushd "$APKLIBDIR"

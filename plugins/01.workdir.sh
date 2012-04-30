@@ -13,6 +13,7 @@ workdir_Test(){
 	then
 		WORKTYPE=2
 		WORKMODE="In progress"
+		PARAMFILE="$WORKDIR/parameter"
 		return
 	fi
 

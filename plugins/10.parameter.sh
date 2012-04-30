@@ -1,7 +1,7 @@
 #!/bin/bash
 #set -vx
 
-MenuAdd "Select parameter file" "parameter_FileSelect"
+#MenuAdd "Select parameter file" "parameter_FileSelect"
 MenuAdd "Edit parameter file" "parameter_Menu"
 
 declare SECTION
@@ -151,6 +151,7 @@ parameter_Make(){
 	BackupFile "${PARAMFILE}"
 	cat "${COMMONBACKUPFILE}"|sed -e "/MACHINE_MODEL/s|${MODEL}|${NEWMODEL}|" | sed -e "/CMDLINE/s|${CMDLINE}|${NEWCMDLINE}|" > "${PARAMFILE}"
 	diff -c ${PARAMFILE} ${COMMONBACKUPFILE} >${PARAMFILE}.patch
+	dialogINF "File parameter saved"
 }
 
 parameter_FileSelect(){
@@ -189,6 +190,11 @@ parameter_Menu(){
 
 	if [ ${PARAMFILEPARSED} -eq 0 ]
 	then
+		parameter_Parse
+	fi
+
+	if [ ${PARAMFILEPARSED} -eq 0 ]
+	then
 		parameter_FileSelect
 	fi
 
@@ -206,7 +212,6 @@ parameter_Menu(){
 			;;
 		*)
 			PARAMFILEPARSED=0
-			PARAMFILE=""
 			;;
 	esac
 }
