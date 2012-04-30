@@ -85,6 +85,7 @@ FileSignature(){
 
 SystemFsck(){
 	pushd "$WORKDIR/Image"  2>/dev/null
+	sudo sync
 	sudo /sbin/fsck.ext3 -pf system.img 2>&1 >> "$LOGFILE"
 	popd	
 }

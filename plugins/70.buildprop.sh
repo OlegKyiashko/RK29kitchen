@@ -1,7 +1,7 @@
 #!/bin/bash
 set -vx
 
-#MenuAdd "Modify build.prop" "buildprop_Menu"
+MenuAdd "Modify build.prop" "buildprop_Menu"
 
 #source 00.common.sh
 #WORKDIR="../work/"
@@ -29,26 +29,22 @@ buildprop_Menu(){
 	do
 		dialogBT
 		dialog --colors --backtitle "${DIALOGBT}" --title "Install system apps" --menu "Select:" 20 70 10 \
-			"clean" "Remove system apps" \
-			"busybox" "Install busybox" \
-			"su" "Install su" \
-			"apk" "Install apps as system" \
+			"tz" "Change default TimeZone" \
+			"lc" "Change default locale" \
+			"wifi" "Change default wifi settings" \
 			"X" "Exit" 2> $tempfile
 		case $? in
 			0)
 				s=`cat $tempfile`
 				case $s in
-					"busybox")
-						installApps_BB
+					"tz")
+						buildprop_TZ
 						;;
-					"su")
-						installApps_SU
+					"lc")
+						buildprop_LC
 						;;
-					"clean")
-						installApps_RemoveSelectedApk
-						;;
-					"apk")
-						installApps_InstallSelectedApk
+					"wifi")
+						buildprop_wifi
 						;;
 					"X")
 						return
