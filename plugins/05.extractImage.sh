@@ -2,43 +2,11 @@
 #set -vx
 
 MenuAdd "Extract image files" "extractImage_Main"
-MenuAdd "Mount /system to Image/system" "extractImage_Mount"
-MenuAdd "Umount /system from Image/system" "extractImage_Umount"
 
 initrd='initrd.img'
 ramdisk='ramdisk'
 system='system'
 zimage='zImage'
-
-extractImage_Mount(){
-	if [ -f "${WORKDIR}/Image/system/build.prop" ]
-	then
-		dialogINF "Already mounted"
-		return
-	fi
-	sudo mount "${WORKDIR}/Image/system.img" "${WORKDIR}/Image/$system"
-	if [ $? -eq 0 ]
-	then
-		dialogINF "Mount OK"
-	else
-		dialogINF "Mount error"
-	fi
-}
-
-extractImage_Umount(){
-	if [ ! -f "${WORKDIR}/Image/system/build.prop" ]
-	then
-		dialogINF "Already umounted"
-		return
-	fi
-	sudo umount -f "${WORKDIR}/Image/$system"
-	if [ $? -eq 0 ]
-	then
-		dialogINF "Umount OK"
-	else
-		dialogINF "Umount error"
-	fi
-}
 
 extractImage_ExtractFiles(){
 	pushd Image
@@ -58,14 +26,10 @@ extractImage_ExtractFiles(){
 		sudo find recovery-$ramdisk -xtype f -print0|xargs -0 ls -l|awk '{print $5 "\t" $9}' |sed -e "s/  recovery-${ramdisk}/ /">_recovery-ramdisk.lst3
 	fi
 
-	mkdir -p $system
-	sudo /sbin/fsck.ext3 -pf system.img
-	sudo mount system.img $system
+	SystemMount
 	sudo find $system -xtype f -print0|xargs -0 ls -ln --time-style="+%F %T"|sed -e's/ ${system}/ \/system/' >_system.lst
 	sudo find $system -xtype f -print0|xargs -0 ls -ln --time-style="+"|sed -e's/ ${system}/ \/system/' >_system.lst2
 	sudo find $system -xtype f -print0|xargs -0 ls -l|awk '{print $5 "\t" $9}'|sed -e's/ ${system}/ \/system/' >_system.lst3
-	#sudo tar zcf system.tar.gz $system
-	#sudo umount system
 
 	strings ${zimage} |grep "Linux version" >_kernel.version
 	if [ -f recovery-$zimage ]

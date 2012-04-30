@@ -34,12 +34,12 @@ makeUpdateImage_ListBL(){
 }
 
 makeUpdateImage_SelectBL(){
-	echo ${BL[@]}| xargs dialog --colors --backtitle "${DIALOGBT}" --title "Change bootloader" \
-	  --menu "Current bootloader: $BOOTLOADER\nChoose bootloader:" 20 70 15 2>$tempfile
+	pushd "${BASEDIR}/plugins/bootloader"
+	FilesMenuDlg ".bin" "Change bootloader" "Current bootloader: $BOOTLOADER\nChoose bootloader:"
 	case $? in
 		0)
 			bl=`cat $tempfile`
-			if [ "$bl" == "Exit" ] || [ "$bl" == "${BOOTLOADER}" ]
+			if [ "$bl" == "${BOOTLOADER}" ]
 			then
 				return
 			fi
@@ -91,11 +91,7 @@ makeUpdateImage_MkInitRD(){
 makeUpdateImage_Image(){
 	cd "${WORKDIR}"
 
-        cd Image
-        sudo sync
-        sudo umount -f system
-	sudo /sbin/fsck.ext3 -pf system.img
-        cd ..
+        SystemUmount
 
 	if [ -z "${BOOTLOADER}" ]
 	then

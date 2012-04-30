@@ -2,25 +2,9 @@
 #set -vx
 
 MenuAdd "System apps" "installApps_Menu"
-installApps_Begin(){
-	pushd Image  2>/dev/null
-	sudo mount system.img system -o loop 2>>"${LOGFILE}"
-	popd  2>/dev/null
-}
-
-installApps_End(){
-	pushd Image  2>/dev/null
-	SetDirPermissions system/app/ 0 0 0644 0755
-	SetDirPermissions system/lib/ 0 0 0644 0755
-	SetDirPermissions system/bin/ 0 0 0755 0755
-	SetDirPermissions system/xbin/ 0 0 0755 0755
-	sudo chmod +s system/xbin/su
-	#	sudo umount -f system 2>>"${LOGFILE}"
-	popd 2>/dev/null
-}
 
 installApps_BB(){
-	installApps_Begin
+	SystemMount
 	cd "$WORKDIR/Image"
 
 	sudo cp "${PLUGINS}/installApps/bin/busybox" system/xbin/busybox 2>>"${LOGFILE}"
@@ -36,11 +20,11 @@ installApps_BB(){
 		sudo ln -s /system/xbin/busybox ${dst} 2>>"${LOGFILE}"
 	done
 
-	installApps_End
+	SystemFixPermissions
 }
 
 installApps_SU(){
-	installApps_Begin
+	SystemMount
 	cd "$WORKDIR/Image"
 
 	sudo mv system/bin/su "system/bin/su#" 2>/dev/null 
@@ -49,7 +33,7 @@ installApps_SU(){
 	sudo cp "${PLUGINS}/installApps/bin/su" system/xbin/su 2>>"${LOGFILE}"
 	sudo cp "${PLUGINS}/installApps/bin/Superuser.apk" system/app/ 2>>"${LOGFILE}"
 
-	installApps_End
+	SystemFixPermissions
 }
 
 installApps_ExtractSystemLibs(){
@@ -71,7 +55,7 @@ installApps_ExtractSystemLibs(){
 }
 
 installApps_RemoveListApk(){
-	installApps_Begin
+	SystemMount
 	apklist=("${!1}")
 	pushd "${WORKDIR}/Image/system/app/"
 	apklistsize=${#apklist[@]}
@@ -100,11 +84,11 @@ installApps_RemoveListApk(){
 	popd
 
 	installApps_ExtractSystemLibs
-	installApps_End
+	SystemFixPermissions
 }
 
 installApps_RemoveAllApk(){
-	installApps_Begin
+	SystemMount
 
 	pushd "${WORKDIR}/Image/system/app/"
 	ls -1|grep -f "${PLUGINS}/installApps/apkblacklist.txt" > "$tempfile"
@@ -114,7 +98,7 @@ installApps_RemoveAllApk(){
 }
 
 installApps_RemoveSelectedApk(){
-	installApps_Begin
+	SystemMount
 
 	pushd "${WORKDIR}/Image/system/app/"
 	ls -1|grep -f "${PLUGINS}/installApps/apkblacklist.txt" > "$tempfile"
@@ -132,7 +116,7 @@ installApps_RemoveSelectedApk(){
 }
 
 installApps_InstallListApk(){
-	installApps_Begin
+	SystemMount
 	apklist=("${!1}")
 	pushd "${PLUGINS}/installApps/apk"
 	apklistsize=${#apklist[@]}
@@ -143,7 +127,7 @@ installApps_InstallListApk(){
 	done
 	popd
 	installApps_ExtractSystemLibs
-	installApps_End
+	SystemFixPermissions
 }
 
 installApps_InstallAllApk(){

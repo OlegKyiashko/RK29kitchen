@@ -83,6 +83,37 @@ FileSignature(){
 	COMMONFILESIGNATURE=`dd if="$1" bs=1 count=4`
 }
 
+SystemFsck(){
+	pushd "$WORKDIR/Image"  2>/dev/null
+	sudo /sbin/fsck.ext3 -pf system.img 2>&1 >> "$LOGFILE"
+	popd	
+}
+
+SystemMount(){
+	pushd "$WORKDIR/Image"  2>/dev/null
+	if [ ! -d "system" ]
+	then
+		mkdir "system"
+	fi
+	if [ ! -f "system/build.prop"]
+	then
+		SystemFsck
+		sudo mount system.img system -o loop 2>>"${LOGFILE}"
+	fi
+	popd  2>/dev/null
+}
+
+SystemUmount(){
+	pushd "$WORKDIR/Image"  2>/dev/null
+	if [ -d "system" ] && [ -f "system/build.prop"]
+	then
+		sudo sync
+		sudo umount system  2>>"${LOGFILE}"
+		SystemFsck
+	fi
+	popd  2>/dev/null
+}
+
 SetDirPermissions(){
 	path=$1
 	uid=$2
@@ -91,7 +122,7 @@ SetDirPermissions(){
 	dmod=$5
 	find ${path} -type f -print0| xargs -0 sudo chmod ${fmod} 2>>${LOGFILE}
 	find ${path} -type d -print0| xargs -0 sudo chmod ${dmod} 2>>${LOGFILE}
-	sudo chown -R ${uid}:${gid} "${ath}" 2>>${LOGFILE}
+	sudo chown -R ${uid}:${gid} "${path}" 2>>${LOGFILE}
 }
 
 SetFilePermissions(){
@@ -101,6 +132,17 @@ SetFilePermissions(){
 	mod="$4"
 	sudo chmod ${mod} "$fn" 2>>"${LOGFILE}"
 	sudo chown ${uid}:${gid} "$fn" 2>>"${LOGFILE}"
+}
+
+SystemFixPermissions(){
+	SystemMount
+	pushd "$WORKDIR/Image"  2>/dev/null
+	SetDirPermissions system/app/ 0 0 0644 0755
+	SetDirPermissions system/lib/ 0 0 0644 0755
+	SetDirPermissions system/bin/ 0 0 0755 0755
+	SetDirPermissions system/xbin/ 0 0 0755 0755
+	sudo chmod +s system/xbin/su
+	popd 2>/dev/null
 }
 
 ApkLibExtract(){
@@ -201,4 +243,26 @@ FilesMenuDlg(){
 	FileToArray "$tempfile"
 	return $r
 }
+
+GetBuildProp(){
+	prop="$1"
+	file="$WORKDIR/Image/system/build.prop"
+	BUILDPROP=$(grep "${prop}=" "$file"|cut -d= -f2)
+}
+
+SetBuildProp(){
+	prop="$1"
+	value="$2"
+	file="$WORKDIR/Image/system/build.prop"
+	grep -q "${prop}=" "$file"
+	if [ $? -eq 0 ]
+	then
+		cat "$file"| sed -e "s/^${prop}=.*$/${prop}=${value}/" > "$tempdir/build.prop"
+		sudo mv "$tempdir/build.prop" "$file"
+	else
+		sudo echo "" >> "$file"
+		sudo echo "${prop}=${value}" >> "$file"
+	fi
+}
+
 

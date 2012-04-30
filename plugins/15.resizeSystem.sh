@@ -7,6 +7,7 @@ resizeSystem_Process(){
 	sz=$1
 	fs=$2
 
+	SystemMount
 	pushd Image 2>> "${LOGFILE}"
 	dd if=/dev/zero of=system.new bs=1M count=${sz} 2>> "${LOGFILE}"
 	mkfs -t ${fs} -F -L system -m 0 system.new  2>> "${LOGFILE}"
@@ -16,9 +17,8 @@ resizeSystem_Process(){
 	sudo tar cf - * | sudo tar xvf - -C ../system1 2>> "${LOGFILE}"
 	r=$?
 	cd ..
-	sudo sync
+	SystemUmount
 	sudo umount -f system1 2>> "${LOGFILE}"
-	sudo umount -f system 2>> "${LOGFILE}"
 	rm -rf system1
 
 	if [ $r -ne 0 ]
@@ -28,7 +28,7 @@ resizeSystem_Process(){
 		BackupFile system.img
 		mv system.new system.img  2>> "${LOGFILE}"
 	fi
-
+	SystmMount
 	popd 2>> "${LOGFILE}"
 }
 
