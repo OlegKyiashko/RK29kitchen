@@ -96,7 +96,7 @@ SystemMount(){
 	then
 		mkdir "system"
 	fi
-	if [ ! -f "system/build.prop"]
+	if [ ! -f "system/build.prop" ]
 	then
 		SystemFsck
 		sudo mount system.img system -o loop 2>>"${LOGFILE}"
@@ -106,7 +106,7 @@ SystemMount(){
 
 SystemUmount(){
 	pushd "$WORKDIR/Image"  2>/dev/null
-	if [ -d "system" ] && [ -f "system/build.prop"]
+	if [ -d "system" ] && [ -f "system/build.prop" ]
 	then
 		sudo sync
 		sudo umount system  2>>"${LOGFILE}"

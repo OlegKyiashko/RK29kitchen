@@ -35,7 +35,7 @@ makeUpdateImage_ListBL(){
 
 makeUpdateImage_SelectBL(){
 	pushd "${BASEDIR}/plugins/bootloader"
-	FilesMenuDlg ".bin" "Change bootloader" "Current bootloader: $BOOTLOADER\nChoose bootloader:"
+	FilesMenuDlg "*.bin" "Change bootloader" "Current bootloader: $BOOTLOADER\nChoose bootloader:"
 	case $? in
 		0)
 			bl=`cat $tempfile`
@@ -47,10 +47,13 @@ makeUpdateImage_SelectBL(){
 			then
 				cp "${BASEDIR}/plugins/bootloader/$bl" "${WORKDIR}"
 			fi
+			pushd "$WORKDIR"
 			BackupFile package-file
 			cat ${COMMONBACKUPFILE}| sed -e "s/${BOOTLOADER}/${bl}/" > package-file
+			popd
 			;;
 	esac
+	popd
 }
 
 makeUpdateImage_BL(){
