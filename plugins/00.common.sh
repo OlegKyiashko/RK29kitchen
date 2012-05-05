@@ -86,8 +86,8 @@ FileSignature(){
 SystemFsck(){
 	pushd "$WORKDIR/Image"  2>/dev/null
 	sudo sync
-	sudo /sbin/fsck.ext3 -pf system.img 2>&1 >> "$LOGFILE"
-	popd	
+	sudo /sbin/fsck.ext3 -yf system.img 2>&1 >> "$LOGFILE"
+	popd
 }
 
 SystemMount(){
@@ -155,25 +155,25 @@ ApkLibExtract(){
 		return
 	fi
 	APKLIBDIR="$tempdir/$apk/"
-	unzip "$apk" -d "$APKLIBDIR" "*.so"
+	unzip "$apk" -d "$APKLIBDIR" "*.so" 2>>"${LOGFILE}" >>"${LOGFILE}"
 	pushd "$APKLIBDIR"
 	if [ -d lib/armeabi-v7a ]
 	then
-		mv lib/armeabi-v7a/*.so .
+		mv lib/armeabi-v7a/*.so . 2>>"${LOGFILE}"
 	elif [ -d lib/armeabi ]
 	then
-		mv lib/armeabi/*.so .
+		mv lib/armeabi/*.so . 2>>"${LOGFILE}"
 	fi
 	rm -rf lib 2>/dev/null
 	APKLIBFILES=$(ls -1 *.so)
-	popd
+	popd 2>/dev/null
 }
 
 DirToArray(){
 	fn="$1"
 	ifs=$IFS
 	IFS=$'\n'
-	FILEARRAY=($(ls -1 ${fn}))
+	FILEARRAY=($(ls -1 ${fn} 2>>"${LOGFILE}"))
 	IFS=$ifs
 }
 

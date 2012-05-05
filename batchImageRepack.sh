@@ -1,5 +1,5 @@
 #!/bin/bash
-#set -vx 
+set -vx 
 
 #settings for auto fix
 mymodel="CUBE U9GT 2"
@@ -14,18 +14,12 @@ usage(){
 	echo    $0 path_to_image_directory
 }
 
-if [ "x$1" == "x" ]
-then
-	usage
-	exit 1
-fi
-
 BASEDIR=`dirname $0`
 pushd "$BASEDIR"
 BASEDIR=`pwd`
 popd
 
-WORKDIR=`dirname $1`
+WORKDIR=${1:-`pwd`}
 pushd "$WORKDIR"
 WORKDIR=`pwd`"/"
 popd
@@ -62,9 +56,8 @@ then
 	exit 1
 fi
 
-#unpack img
+#unpack 
 extractImage_ExtractImage
-extractImage_ExtractProcess
 
 #parse && edit parameter file
 PARAMFILE="parameter"

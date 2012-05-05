@@ -27,7 +27,6 @@ workdir_Test
 
 extractImage_ExtractImage
 extractImage_ExtractImgFile
-extractImage_ExtractProcess
 
 parameter_Parse
 parameter_Edit

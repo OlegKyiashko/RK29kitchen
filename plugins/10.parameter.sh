@@ -151,7 +151,7 @@ parameter_Make(){
 	BackupFile "${PARAMFILE}"
 	cat "${COMMONBACKUPFILE}"|sed -e "/MACHINE_MODEL/s|${MODEL}|${NEWMODEL}|" | sed -e "/CMDLINE/s|${CMDLINE}|${NEWCMDLINE}|" > "${PARAMFILE}"
 	diff -c ${PARAMFILE} ${COMMONBACKUPFILE} >${PARAMFILE}.patch
-	dialogINF "File parameter saved"
+	#dialogINF "File parameter saved"
 }
 
 parameter_FileSelect(){

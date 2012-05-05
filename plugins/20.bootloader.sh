@@ -4,7 +4,9 @@
 MenuAdd "Change bootloader" "bootloader_BL"
 
 bootloader_ParseBL(){
+	pushd "$WORKDIR" 2>/dev/null
 	BOOTLOADER=`grep bootloader package-file |cut -f2|tr -d "\n\r"`
+	popd 2>/dev/null
 }
 
 bootloader_ListBL(){

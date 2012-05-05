@@ -20,7 +20,7 @@ extractImage_ExtractFiles(){
 	if [ -f recovery-$initrd ]
 	then
 		mkdir -p recovery-$ramdisk
-		zcat recovery-$initrd | ( cd recovery-$ramdisk; cpio -idm )
+		zcat "recovery-$initrd" | ( cd "recovery-$ramdisk"; cpio -idm )
 		sudo find recovery-$ramdisk -xtype f -print0|xargs -0 ls -ln --time-style="+%F %T" |sed -e "s/ recovery-${ramdisk}/ /">_recovery-ramdisk.lst
 		sudo find recovery-$ramdisk -xtype f -print0|xargs -0 ls -ln --time-style="+" |sed -e "s/  recovery-${ramdisk}/ /">_recovery-ramdisk.lst2
 		sudo find recovery-$ramdisk -xtype f -print0|xargs -0 ls -l|awk '{print $5 "\t" $9}' |sed -e "s/  recovery-${ramdisk}/ /">_recovery-ramdisk.lst3
@@ -103,6 +103,11 @@ extractImage_ExtractRecoveryImg(){
 }
 
 extractImage_ExtractProcess(){
+	pushd "$WORKDIR" 2>/dev/null
+	BackupFile package-file
+	cat ${COMMONBACKUPFILE}| sed -e "s/#kernel/kernel/" > package-file
+	popd 2>/dev/null
+
 	extractImage_ExtractBootImg
 	extractImage_ExtractKernelImg
 	extractImage_ExtractRecoveryImg
@@ -112,11 +117,12 @@ extractImage_ExtractProcess(){
 
 extractImage_ExtractImage(){
 	pushd "$WORKDIR"
-	cp "${PLUGINS}"/extractImage/bootimg.cfg Image/
+	cp "${PLUGINS}/extractImage/bootimg.cfg" Image/
+	cp "${PLUGINS}/extractImage/recovery.cfg" Image/
 
-	cp "${PLUGINS}"/extractImage/package-file .
-	cp "${PLUGINS}"/extractImage/recover-script .
-	cp "${PLUGINS}"/extractImage/update-script .
+	cp "${PLUGINS}/extractImage/package-file" .
+	cp "${PLUGINS}/extractImage/recover-script" .
+	cp "${PLUGINS}/extractImage/update-script" .
 
 	mv parameter1G parameter 2>/dev/null
 

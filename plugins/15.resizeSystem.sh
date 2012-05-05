@@ -28,7 +28,7 @@ resizeSystem_Process(){
 		BackupFile system.img
 		mv system.new system.img  2>> "${LOGFILE}"
 	fi
-	SystmMount
+	SystemMount
 	popd 2>> "${LOGFILE}"
 }
 

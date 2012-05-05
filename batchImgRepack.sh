@@ -64,7 +64,6 @@ fi
 
 #unpack img
 extractImage_ExtractImgFile $1
-extractImage_ExtractProcess
 
 #parse && edit parameter file
 PARAMFILE="parameter"
@@ -83,10 +82,12 @@ installApps_BB
 installApps_RemoveAllApk
 installApps_InstallAllApk
 
+SetBuildProp "persist.sys.timezone" "Europe/Kiev"
 SetBuildProp "ro.product.locale.language" "uk"
 SetBuildProp "ro.product.locale.region" "UA"
 SetBuildProp "ro.com.android.dateformat" "yyyy/MM/dd"
 SetBuildProp "wifi.supplicant_scan_interval" "300"
+SetBuildProp "gsm.sim.operator.numeric" "131020"
 
 echo You can make changes manually now.
 echo -n Make update.img y/n [y]?

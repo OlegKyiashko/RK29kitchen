@@ -19,16 +19,17 @@ makeUpdateImage_MkInitRD(){
         find . -type f -name "*#" -print0 | xargs -0 sudo rm -f 
 	find . -exec touch -d "1970-01-01 01:00" {} \;
 	find . ! -name "."|sort|cpio -oa -H newc --owner=root:root|gzip -n >../${initrd}
+	cd ..
 
 	BackupFile "recovery-${initrd}"
 	BackupFile recovery.img
 
-	cd ../recovery-$ramdisk
+	cd recovery-$ramdisk
         find . -type f -name "*#" -print0 | xargs -0 sudo rm -f 
 	find . -exec touch -d "1970-01-01 01:00" {} \;
 	find . ! -name "."|sort|cpio -oa -H newc --owner=root:root|gzip -n >../recovery-${initrd}
-
 	cd ..
+
 	abootimg --create boot.img -f bootimg.cfg -k $zimage -r ${initrd}
 	abootimg --create recovery.img -f recovery.cfg -k $zimage -r recovery-${initrd}
 
@@ -39,12 +40,13 @@ makeUpdateImage_MkInitRD(){
 
 makeUpdateImage_Image(){
 	cd "${WORKDIR}"
+	sudo rm Image/system/build.prop.original
 
         SystemUmount
 
 	if [ -z "${BOOTLOADER}" ]
 	then
-		makeUpdateImage_ParseBL
+		bootloader_ParseBL
 	fi
 	afptool -pack . ${img}.tmp 2>>"${LOGFILE}"
 	if [ ! -f "${img}.tmp" ]
