@@ -25,6 +25,9 @@ also
 - Plug-in to remove files from the "black list"
 - build.prop fixes
 
+and
+- dump current flash from device
+
 TODO
 
 Notes
@@ -40,6 +43,7 @@ Use:
 [full_or_partial_path/]menu.sh [workdir]
 [full_or_partial_path/]batchImgRepack.sh [full_or_partial_path/]old.img
 [full_or_partial_path/]batchImageRepack.sh [full_or_partial_path_to_Image]
+flashdump
 
 workdir may contain update.img (img mode) or set of files (Image mode)
 
@@ -81,6 +85,9 @@ Russian:
 - изменять список предлагаемых системных приложений
 - плагин для удаления файлов из "черного списка"
 - плагин изменение некоторых настроек build.prop
+
+еще
+- сливать прошивку с устройства
 
 Заметки
 Пакет работает на операционных системах Linux (разработка и тестирование на OpenSUSE 11.4/12.2)
