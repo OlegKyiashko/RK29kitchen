@@ -102,8 +102,16 @@ extractImage_ExtractRecoveryImg(){
 	popd
 }
 
+extractImage_ExtractProcess(){
+	extractImage_ExtractBootImg
+	extractImage_ExtractKernelImg
+	extractImage_ExtractRecoveryImg
+	extractImage_ExtractFiles
+	workdir_Test
+}
 
 extractImage_ExtractImage(){
+	pushd "$WORKDIR"
 	cp "${PLUGINS}"/extractImage/bootimg.cfg Image/
 
 	cp "${PLUGINS}"/extractImage/package-file .
@@ -119,6 +127,7 @@ extractImage_ExtractImage(){
 		BackupFile package-file
 		cat ${COMMONBACKUPFILE}| sed -e "s/${BOOTLOADER}/${bl}/" > package-file
 	fi
+	popd
 	extractImage_ExtractProcess
 }
 
@@ -127,6 +136,7 @@ extractImage_ExtractImgFile(){
 	img_unpack "${IMGFILE}" "${IMGFILE}.tmp"
 	afptool -unpack "${IMGFILE}.tmp" .
 	rm "${IMGFILE}.tmp"
+	extractImage_ExtractProcess
 }
 
 extractImage_ExtractImg(){
@@ -140,7 +150,6 @@ extractImage_ExtractImg(){
 				if [ -f "$f" ]
 				then
 					extractImage_ExtractImgFile "$f"
-					extractImage_ExtractProcess
 					return
 				fi
 				;;
@@ -155,14 +164,6 @@ extractImage_ExtractImg(){
 				;;
 		esac
 	done
-}
-
-extractImage_ExtractProcess(){
-	extractImage_ExtractBootImg
-	extractImage_ExtractKernelImg
-	extractImage_ExtractRecoveryImg
-	extractImage_ExtractFiles
-	workdir_Test
 }
 
 extractImage_Main(){

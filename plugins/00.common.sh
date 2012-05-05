@@ -16,7 +16,7 @@ trap "rm -rf $tempfile $tempdir" 0 1 2 5 15
 declare MENUITEM
 declare FUNCTION
 N=0
-MenuAdd() {
+MenuAdd(){
 	N=$[N+1]
 	MENUITEMS="${MENUITEMS} \"$N\" \"$1\""
 	FUNCTION[$N]="$2"
@@ -181,11 +181,11 @@ FileToArray(){
 	fn="$1"
 	ifs=$IFS
 	IFS=$'\n'
-	FILEARRAY=( `cat $fn|sed -e 's/" *"/\n/g'|sed -e 's/"//g'` )
+	FILEARRAY=( `sort $fn|sed -e 's/" *"/\n/g'|sed -e 's/"//g'` )
 	IFS=$ifs
 }
 
-# ListCheckboxDlg "" FILEARRAY[@] "Install" "Choose files:"
+# ListCheckboxDlg LISTON[@] FILEARRAY[@] "Install" "Choose files:"
 ListCheckboxDlg(){
 	listOn=("${!1}")
 	listOff=("${!2}")
@@ -198,6 +198,10 @@ ListCheckboxDlg(){
 		for (( i=0; i<${listsize}; i++ ))
 		do
 			f=${listOn[$i]}
+			if [ -z "$f" ]
+			then
+				continue
+			fi
 			lst="${lst} \"${f}\" \"\" on"
 		done
 	fi
@@ -208,6 +212,10 @@ ListCheckboxDlg(){
 		for (( i=0; i<${listsize}; i++ ))
 		do
 			f=${listOff[$i]}
+			if [ -z "$f" ]
+			then
+				continue
+			fi
 			lst="${lst} \"${f}\" \"\" off"
 		done
 	fi
@@ -232,18 +240,58 @@ FilesMenuDlg(){
 	headertxt="$3"
 	DirToArray "${fn}"
 	n=${#FILEARRAY[@]}
+	lst=""
 	for (( i=0; i<${n}; i++ ))
 	do
 		f=${FILEARRAY[$i]}
+		if [ -z "$f" ]
+		then
+			continue
+		fi
 		lst="${lst} \"${f}\" \"\""
 	done
 
 	dialogBT
 	echo $lst | xargs dialog --colors --backtitle "${DIALOGBT}" --title "$titletxt" --menu "$headertxt" 20 70 15 2>$tempfile
 	r=$?
-	FileToArray "$tempfile"
 	return $r
 }
+
+# FileMenuMenuDlg "path/menufile" "Change default" "Select:" 
+FileMenuMenuDlg(){
+	fn="$1"
+	titletxt="$2"
+	headertxt="$3"
+	dialogBT
+	cat "$fn"| xargs dialog --colors --backtitle "${DIALOGBT}" --title "$titletxt" --menu "$headertxt" 20 70 15 2>$tempfile
+	r=$?
+	return $r
+}
+
+# MenuDlgFromFile "path/menufile" "Change default" "Select:" 
+ListMenuDlg(){
+	fn="$1"
+	titletxt="$2"
+	headertxt="$3"
+	FileToArray "${fn}"
+	n=${#FILEARRAY[@]}
+	lst=""
+	for (( i=0; i<${n}; i++ ))
+	do
+		e=${FILEARRAY[$i]}
+		if [ -z "$e" ]
+		then
+			continue
+		fi
+		lst="${lst} \"${e}\" \"\""
+	done
+
+	dialogBT
+	echo $lst | xargs dialog --colors --backtitle "${DIALOGBT}" --title "$titletxt" --menu "$headertxt" 20 70 15 2>$tempfile
+	r=$?
+	return $r
+}
+
 
 GetBuildProp(){
 	prop="$1"
@@ -255,10 +303,14 @@ SetBuildProp(){
 	prop="$1"
 	value="$2"
 	file="$WORKDIR/Image/system/build.prop"
+	if [ ! -f "${file}.original" ]
+	then
+		sudo cp "$file" "${file}.original"
+	fi
 	grep -q "${prop}=" "$file"
 	if [ $? -eq 0 ]
 	then
-		cat "$file"| sed -e "s/^${prop}=.*$/${prop}=${value}/" > "$tempdir/build.prop"
+		cat "$file"| sed -e "s|^${prop}=.*$|${prop}=${value}|" > "$tempdir/build.prop"
 		sudo mv "$tempdir/build.prop" "$file"
 	else
 		sudo echo "" >> "$file"

@@ -80,13 +80,20 @@ resizeSystem_Process $[$mysystem-1] "$mysystemfs"
 
 installApps_SU
 installApps_BB
-installApps_AllAPK
+installApps_RemoveAllApk
+installApps_InstallAllApk
+
+SetBuildProp "ro.product.locale.language" "uk"
+SetBuildProp "ro.product.locale.region" "UA"
+SetBuildProp "ro.com.android.dateformat" "yyyy/MM/dd"
+SetBuildProp "wifi.supplicant_scan_interval" "300"
 
 echo You can make changes manually now.
 echo -n Make update.img y/n [y]?
 read a
 case "$a" in
         "y"|"Y"|"")
-                makeUpdateProcess
+                makeUpdateImage_Process
                 ;;
 esac
+#WORKDIR="../work/"

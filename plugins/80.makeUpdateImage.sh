@@ -1,7 +1,6 @@
 #!/bin/bash
 #set -vx
 
-MenuAdd "Change bootloader" "makeUpdateImage_BL"
 MenuAdd "Make update.img image file" "makeUpdateImage_Main"
 
 initrd='initrd.img'
@@ -9,59 +8,6 @@ ramdisk='ramdisk'
 system='system'
 zimage='zImage'
 img='update.img'
-
-makeUpdateImage_ParseBL(){
-	BOOTLOADER=`grep bootloader package-file |cut -f2|tr -d "\n\r"`
-}
-
-makeUpdateImage_ListBL(){
-	pushd "${BASEDIR}/plugins/bootloader"
-	n=0
-
-	if [ ! -f "${BOOTLOADER}" ]
-	then
-		cp "${WORKDIR}/${BOOTLOADER}" .
-	fi
-
-	DirToArray "*bin"
-	BL=""
-	for (( i=0; i<${#FILEARRAY[@]}; i++ ))
-	do
-		BL="$BL \"${FILEARRAY[i]}\" \"\""
-	done
-	BL[$n]="\"Exit\" \"\""
-	popd
-}
-
-makeUpdateImage_SelectBL(){
-	pushd "${BASEDIR}/plugins/bootloader"
-	FilesMenuDlg "*.bin" "Change bootloader" "Current bootloader: $BOOTLOADER\nChoose bootloader:"
-	case $? in
-		0)
-			bl=`cat $tempfile`
-			if [ "$bl" == "${BOOTLOADER}" ]
-			then
-				return
-			fi
-			if [ ! -f "${WORKDIR}/${bl}" ]
-			then
-				cp "${BASEDIR}/plugins/bootloader/$bl" "${WORKDIR}"
-			fi
-			pushd "$WORKDIR"
-			BackupFile package-file
-			cat ${COMMONBACKUPFILE}| sed -e "s/${BOOTLOADER}/${bl}/" > package-file
-			popd
-			;;
-	esac
-	popd
-}
-
-makeUpdateImage_BL(){
-	cd "${WORKDIR}"
-	makeUpdateImage_ParseBL
-	makeUpdateImage_ListBL
-	makeUpdateImage_SelectBL
-}
 
 makeUpdateImage_MkInitRD(){
 	pushd "${WORKDIR}/Image/"

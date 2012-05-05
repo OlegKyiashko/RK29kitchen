@@ -9,7 +9,7 @@ declare SSIZE
 MODEL="CUBE U9GT 2"
 PARAMFILEPARSED=0
 
-parameter_Parse() {
+parameter_Parse(){
 
 	MODEL=`grep MACHINE_MODEL ${PARAMFILE}|cut -d: -f2|tr -d "\n\r"`
 	CMDLINE=`grep CMDLINE ${PARAMFILE}|tr -d "\n\r"`

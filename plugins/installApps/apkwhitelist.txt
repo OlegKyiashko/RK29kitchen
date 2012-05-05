@@ -41,7 +41,7 @@ MusicFX.apk
 NetworkLocation.apk
 NoiseField.apk
 OneTimeInitializer.apk
-OpenWnn.apk
+Provision.apk
 PackageInstaller.apk
 PhaseBeam.apk
 Phone.apk

@@ -1,5 +1,5 @@
 #!/bin/bash
-set -vx 
+#set -vx 
 
 BASEDIR=`dirname $0`
 pushd "$BASEDIR"

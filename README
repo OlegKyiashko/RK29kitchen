@@ -23,9 +23,9 @@ also
 - To create automated scripts based on an existing plugin library
 - Modify the list of proposed system applications
 - Plug-in to remove files from the "black list"
+- build.prop fixes
 
 TODO
-- build.prop fixes
 
 Notes
 The package runs on Linux operating systems (development and testing on OpenSUSE 11.4/12.2)
@@ -39,6 +39,7 @@ To work actively used sudo (must be set up password-less mode) - need to modify 
 Use:
 [full_or_partial_path/]menu.sh [workdir]
 [full_or_partial_path/]batchImgRepack.sh [full_or_partial_path/]old.img
+[full_or_partial_path/]batchImageRepack.sh [full_or_partial_path_to_Image]
 
 workdir may contain update.img (img mode) or set of files (Image mode)
 
@@ -79,9 +80,7 @@ Russian:
 - создавать  автоматизированные скрипты на основе существующей библиотеки плагинов
 - изменять список предлагаемых системных приложений
 - плагин для удаления файлов из "черного списка"
-
-TODO
-- build.prop
+- плагин изменение некоторых настроек build.prop
 
 Заметки
 Пакет работает на операционных системах Linux (разработка и тестирование на OpenSUSE 11.4/12.2)
@@ -95,6 +94,7 @@ TODO
 Использование:
 [full_or_partial_path/]menu.sh [WorkDir]
 [full_or_partial_path/]batchImgRepack.sh [full_or_partial_path/]old.img
+[full_or_partial_path/]batchImageRepack.sh [full_or_partial_path_to_Image]
 
 WorkDir может содержать update.img (IMG режим) или набор файлов (Image режим)
 

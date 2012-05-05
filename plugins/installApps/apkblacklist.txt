@@ -1,14 +1,12 @@
 21.5.2.apk
 BooksProvider.apk
 bydr.apk
-cifs.apk
 Development.apk
 fndxn.apk
 Gfan.cube.0.7.1.TY.apk
 OpenWnn.apk
 Phonesky.apk
 PinyinIME.apk
-Provision.apk
 RacingMoto.apk
 RE2.1.8B.HD.apk
 Rebooter.apk

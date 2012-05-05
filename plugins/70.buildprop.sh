@@ -1,23 +1,61 @@
 #!/bin/bash
-set -vx
+#set -vx
 
 MenuAdd "Modify build.prop" "buildprop_Menu"
 
-#source 00.common.sh
-#WORKDIR="../work/"
-#GetBuildProp "ro.build.id"
-#echo $BUILDPROP
-
-#SetBuildProp "ro.build.id" "TeSt999"
-#SetBuildProp "test.prop" "TeSt999"
-
-buildPropFix(){
-        pushd "${WORKDIR}/Image/system"
-        property=$1
-        value=$2
-        fn=""
+buildprop_TZ(){
+	GetBuildProp "persist.sys.timezone"
+	ListMenuDlg "${PLUGINS}/buildprop/timezone" "Change default timezone" "Current:${BUILDPROP}\nSelect:"
+	case $? in
+		0)
+			tz=`cat $tempfile`
+			SetBuildProp "persist.sys.timezone" "$tz"
+			;;
+	esac
 }
 
+buildprop_LC(){
+	lngpn="ro.product.locale.language"
+	rgnpn="ro.product.locale.region"
+	GetBuildProp "$lngpn"
+	lng=$BUILDPROP
+	GetBuildProp "$rgnpn"
+	rgn=$BUILDPROP
+	FileMenuMenuDlg "${PLUGINS}/buildprop/locale" "Change default locale" "Current: ${lng}_${rgn}\nSelect:"
+	case $? in
+		0)
+			r=`cat $tempfile`
+			lng=${r:0:2}
+			rgn=${r:3:2}
+			SetBuildProp "$lngpn" "$lng"
+			SetBuildProp "$rgnpn" "$rgn"
+			;;
+	esac
+}
+
+buildprop_DateFormat(){
+	pn="ro.com.android.dateformat"
+	GetBuildProp "$pn"
+	ListMenuDlg "${PLUGINS}/buildprop/dateformat" "Change default dateformat" "Current:${BUILDPROP}\nSelect:"
+	case $? in
+		0)
+			tz=`cat $tempfile`
+			SetBuildProp "$pn" "$tz"
+			;;
+	esac
+}
+
+buildprop_WIFI(){
+	pn="wifi.supplicant_scan_interval"
+	GetBuildProp "$pn"
+	ListMenuDlg "${PLUGINS}/buildprop/wifiScanInterval" "Change default wifi scan interval" "Current:${BUILDPROP}\nSelect:"
+	case $? in
+		0)
+			v=`cat $tempfile`
+			SetBuildProp "$pn" "$v"
+			;;
+	esac
+}
 buildprop_Menu(){
 	if [ "${WORKMODE}" != "In progress" ] && [ "${WORKMODE}" != "Image" ]
 	then
@@ -29,9 +67,10 @@ buildprop_Menu(){
 	do
 		dialogBT
 		dialog --colors --backtitle "${DIALOGBT}" --title "Install system apps" --menu "Select:" 20 70 10 \
-			"tz" "Change default TimeZone" \
+			"tz" "Change default timezone" \
 			"lc" "Change default locale" \
-			"wifi" "Change default wifi settings" \
+			"dateformat" "Change default dateformat" \
+			"wifi" "Change default wifi scan interval" \
 			"X" "Exit" 2> $tempfile
 		case $? in
 			0)
@@ -43,8 +82,11 @@ buildprop_Menu(){
 					"lc")
 						buildprop_LC
 						;;
+					"dateformat")
+						buildprop_DateFormat
+						;;
 					"wifi")
-						buildprop_wifi
+						buildprop_WIFI
 						;;
 					"X")
 						return
