@@ -1,9 +1,9 @@
 #!/bin/bash
 #set -vx
 
-MenuAdd "Flashing update to tablet" "flashing_Main"
+MenuAdd "Flashing update to tablet" "flash_Main"
 
-flashing_Process(){
+flash_Process(){
 	pushd "$WORKDIR" 2>/dev/null
 
 	SystemUmount
@@ -46,7 +46,7 @@ flashing_Process(){
 	popd 2>/dev/null
 }
 
-flashing_Main(){
+flash_Main(){
 	dialogOK "Power off you tablet.\nPress the VOL- button and connect usb cable to PC and tablet\nRelease button"
 
 	if [ "${WORKMODE}" != "In progress" ]
@@ -74,5 +74,5 @@ flashing_Main(){
 			;;
 	esac
 
-	flashing_Process
+	#flash_Process
 }
