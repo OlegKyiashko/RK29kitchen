@@ -6,6 +6,7 @@ MenuAdd "Edit parameter file" "parameter_Menu"
 
 declare SECTION
 declare SSIZE
+declare SSTART
 MODEL="CUBE U9GT 2"
 PARAMFILEPARSED=0
 
@@ -30,23 +31,26 @@ parameter_Parse(){
 	PARTS=(${PARTS//,/ })
 
 	n=0
-	REGEX1="(0x[0-9a-fA-F]*)@0x[0-9a-fA-F]*\(([a-z]*)\)"
-	REGEX2="-@0x[0-9a-fA-F]*\(([a-z]*)\)"
+	REGEX1="(0x[0-9a-fA-F]*)@(0x[0-9a-fA-F]*)\(([a-z]*)\)"
+	REGEX2="-@(0x[0-9a-fA-F]*)\(([a-z]*)\)"
 	for PART in "${PARTS[@]}"
 	do
 		if [[ "${PART}" =~ ${REGEX1} ]]
 		then
 			ssize=${BASH_REMATCH[1]}
-			sname=${BASH_REMATCH[2]}
+			sstart=${BASH_REMATCH[2]}
+			sname=${BASH_REMATCH[3]}
 		elif [[ "${PART}" =~ ${REGEX2} ]]
 		then
-			ssize='-'
-			sname=${BASH_REMATCH[1]}
+			ssize='0'
+			sstart=${BASH_REMATCH[1]}
+			sname=${BASH_REMATCH[2]}
 		else
 			dialogOK 'Ill-formed config line'
 		fi
 		SECTION[$n]=$sname
 		SSIZE[$n]=$ssize
+		SSTART[$n]=$sstart
 		n=$[n+1]
 	done
 	PARAMFILEPARSED=1

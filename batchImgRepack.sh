@@ -34,9 +34,8 @@ BINDIR="${BASEDIR}/bin"
 LOGFILE="${BASEDIR}/log"
 PLUGINS="${BASEDIR}/plugins"
 PATH="${BINDIR}":$PATH
-tempfile=`mktemp 2>/dev/null` || tempfile=/tmp/rk29$$
 
-export BASEDIR WORKDIR BINDIR LOGFILE PATH tempfile PLUGINS
+export BASEDIR WORKDIR BINDIR LOGFILE PATH  PLUGINS
 
 trap "rm -f $tempfile" 0 1 2 5 15
 
