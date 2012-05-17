@@ -1,7 +1,7 @@
 CC=gcc
 CPPFLAGS=-DHAS_BLKID
 CPPFLAGS=-DUSE_OPENSSL
-CFLAGS=-g -O3 -DUSE_OPENSSL -Wall
+CFLAGS=-g -O3 -DUSE_OPENSSL -Wall -s
 LDLIBS=-lblkid
 LDLIBS=-lssl -lcrypto -lusb-1.0
 

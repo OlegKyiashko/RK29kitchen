@@ -12,3 +12,5 @@ fn=naobsd.rkutils.zip
 rm $fn 2>/dev/null
 wget https://github.com/naobsd/rkutils/zipball/master -O $fn
 #unzip -jo $fn "*/rkcrc*"
+
+svn export --force https://rkflashtool.svn.sourceforge.net/svnroot/rkflashtool/trunk/rkflashtool.c
