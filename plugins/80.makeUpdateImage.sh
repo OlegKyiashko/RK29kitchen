@@ -16,7 +16,7 @@ makeUpdateImage_MkInitRD(){
 	BackupFile boot.img
 
 	cd $ramdisk
-        find . -type f -name "*#" -print0 | xargs -0 sudo rm -f 
+        find . -type f -name "*#" -print0 | xargs -0 ${SUDO} rm -f 
 	find . -exec touch -d "1970-01-01 01:00" {} \;
 	find . ! -name "."|sort|cpio -oa -H newc --owner=root:root|gzip -n >../${initrd}
 	cd ..
@@ -25,7 +25,7 @@ makeUpdateImage_MkInitRD(){
 	BackupFile recovery.img
 
 	cd recovery-$ramdisk
-        find . -type f -name "*#" -print0 | xargs -0 sudo rm -f 
+        find . -type f -name "*#" -print0 | xargs -0 ${SUDO} rm -f 
 	find . -exec touch -d "1970-01-01 01:00" {} \;
 	find . ! -name "."|sort|cpio -oa -H newc --owner=root:root|gzip -n >../recovery-${initrd}
 	cd ..
@@ -40,7 +40,7 @@ makeUpdateImage_MkInitRD(){
 
 makeUpdateImage_Image(){
 	cd "${WORKDIR}"
-	sudo rm Image/system/build.prop.original
+	${SUDO} rm Image/system/build.prop.original
 
         SystemUmount
 

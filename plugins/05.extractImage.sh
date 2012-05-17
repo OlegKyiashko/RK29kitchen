@@ -13,23 +13,23 @@ extractImage_ExtractFiles(){
 
 	mkdir -p $ramdisk
 	zcat $initrd | ( cd $ramdisk; cpio -idm )
-	sudo find $ramdisk -xtype f -print0|xargs -0 ls -ln --time-style="+%F %T" |sed -e "s/ ${ramdisk}/ /">_ramdisk.lst
-	sudo find $ramdisk -xtype f -print0|xargs -0 ls -ln --time-style="+" |sed -e "s/ ${ramdisk}/ /">_ramdisk.lst2
-	sudo find $ramdisk -xtype f -print0|xargs -0 ls -l|awk '{print $5 "\t" $9}' |sed -e "s/ ${ramdisk}/ /">_ramdisk.lst3
+	${SUDO} find $ramdisk -xtype f -print0|xargs -0 ls -ln --time-style="+%F %T" |sed -e "s/ ${ramdisk}/ /">_ramdisk.lst
+	${SUDO} find $ramdisk -xtype f -print0|xargs -0 ls -ln --time-style="+" |sed -e "s/ ${ramdisk}/ /">_ramdisk.lst2
+	${SUDO} find $ramdisk -xtype f -print0|xargs -0 ls -l|awk '{print $5 "\t" $9}' |sed -e "s/ ${ramdisk}/ /">_ramdisk.lst3
 
 	if [ -f recovery-$initrd ]
 	then
 		mkdir -p recovery-$ramdisk
 		zcat "recovery-$initrd" | ( cd "recovery-$ramdisk"; cpio -idm )
-		sudo find recovery-$ramdisk -xtype f -print0|xargs -0 ls -ln --time-style="+%F %T" |sed -e "s/ recovery-${ramdisk}/ /">_recovery-ramdisk.lst
-		sudo find recovery-$ramdisk -xtype f -print0|xargs -0 ls -ln --time-style="+" |sed -e "s/  recovery-${ramdisk}/ /">_recovery-ramdisk.lst2
-		sudo find recovery-$ramdisk -xtype f -print0|xargs -0 ls -l|awk '{print $5 "\t" $9}' |sed -e "s/  recovery-${ramdisk}/ /">_recovery-ramdisk.lst3
+		${SUDO} find recovery-$ramdisk -xtype f -print0|xargs -0 ls -ln --time-style="+%F %T" |sed -e "s/ recovery-${ramdisk}/ /">_recovery-ramdisk.lst
+		${SUDO} find recovery-$ramdisk -xtype f -print0|xargs -0 ls -ln --time-style="+" |sed -e "s/  recovery-${ramdisk}/ /">_recovery-ramdisk.lst2
+		${SUDO} find recovery-$ramdisk -xtype f -print0|xargs -0 ls -l|awk '{print $5 "\t" $9}' |sed -e "s/  recovery-${ramdisk}/ /">_recovery-ramdisk.lst3
 	fi
 
 	SystemMount
-	sudo find $system -xtype f -print0|xargs -0 ls -ln --time-style="+%F %T"|sed -e's/ ${system}/ \/system/' >_system.lst
-	sudo find $system -xtype f -print0|xargs -0 ls -ln --time-style="+"|sed -e's/ ${system}/ \/system/' >_system.lst2
-	sudo find $system -xtype f -print0|xargs -0 ls -l|awk '{print $5 "\t" $9}'|sed -e's/ ${system}/ \/system/' >_system.lst3
+	${SUDO} find $system -xtype f -print0|xargs -0 ls -ln --time-style="+%F %T"|sed -e's/ ${system}/ \/system/' >_system.lst
+	${SUDO} find $system -xtype f -print0|xargs -0 ls -ln --time-style="+"|sed -e's/ ${system}/ \/system/' >_system.lst2
+	${SUDO} find $system -xtype f -print0|xargs -0 ls -l|awk '{print $5 "\t" $9}'|sed -e's/ ${system}/ \/system/' >_system.lst3
 
 	strings ${zimage} |grep "Linux version" >_kernel.version
 	if [ -f recovery-$zimage ]

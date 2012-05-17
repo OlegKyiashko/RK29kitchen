@@ -3,6 +3,14 @@
 
 TZ=UTC
 export TZ
+
+UID=$(id -u)
+if [ $UID -ne 0 ]
+then
+	SUDO="sudo"
+fi
+export SUDO
+
 tempfile=`mktemp 2>/dev/null` || tempfile=/tmp/rk29$$
 tempdir=`mktemp -d 2>/dev/null` || tempdir=/tmp/rk29d$$
 mkdir -p $tempdir 2>/dev/null
@@ -85,8 +93,8 @@ FileSignature(){
 
 SystemFsck(){
 	pushd "$WORKDIR/Image"  2>/dev/null
-	sudo sync
-	sudo /sbin/fsck.ext3 -yf system.img 2>&1 >> "$LOGFILE"
+	${SUDO} sync
+	${SUDO} /sbin/fsck.ext3 -yf system.img 2>&1 >> "$LOGFILE"
 	popd
 }
 
@@ -99,7 +107,7 @@ SystemMount(){
 	if [ ! -f "system/build.prop" ]
 	then
 		SystemFsck
-		sudo mount system.img system -o loop 2>>"${LOGFILE}"
+		${SUDO} mount system.img system -o loop 2>>"${LOGFILE}"
 	fi
 	popd  2>/dev/null
 }
@@ -108,8 +116,8 @@ SystemUmount(){
 	pushd "$WORKDIR/Image"  2>/dev/null
 	if [ -d "system" ] && [ -f "system/build.prop" ]
 	then
-		sudo sync
-		sudo umount system  2>>"${LOGFILE}"
+		${SUDO} sync
+		${SUDO} umount system  2>>"${LOGFILE}"
 		SystemFsck
 	fi
 	popd  2>/dev/null
@@ -121,9 +129,9 @@ SetDirPermissions(){
 	gid=$3
 	fmod=$4
 	dmod=$5
-	find ${path} -type f -print0| xargs -0 sudo chmod ${fmod} 2>>${LOGFILE}
-	find ${path} -type d -print0| xargs -0 sudo chmod ${dmod} 2>>${LOGFILE}
-	sudo chown -R ${uid}:${gid} "${path}" 2>>${LOGFILE}
+	find ${path} -type f -print0| xargs -0 ${SUDO} chmod ${fmod} 2>>${LOGFILE}
+	find ${path} -type d -print0| xargs -0 ${SUDO} chmod ${dmod} 2>>${LOGFILE}
+	${SUDO} chown -R ${uid}:${gid} "${path}" 2>>${LOGFILE}
 }
 
 SetFilePermissions(){
@@ -131,8 +139,8 @@ SetFilePermissions(){
 	uid="$2"
 	gid="$3"
 	mod="$4"
-	sudo chmod ${mod} "$fn" 2>>"${LOGFILE}"
-	sudo chown ${uid}:${gid} "$fn" 2>>"${LOGFILE}"
+	${SUDO} chmod ${mod} "$fn" 2>>"${LOGFILE}"
+	${SUDO} chown ${uid}:${gid} "$fn" 2>>"${LOGFILE}"
 }
 
 SystemFixPermissions(){
@@ -142,7 +150,7 @@ SystemFixPermissions(){
 	SetDirPermissions system/lib/ 0 0 0644 0755
 	SetDirPermissions system/bin/ 0 0 0755 0755
 	SetDirPermissions system/xbin/ 0 0 0755 0755
-	sudo chmod +s system/xbin/su
+	${SUDO} chmod +s system/xbin/su
 	popd 2>/dev/null
 }
 
@@ -305,16 +313,16 @@ SetBuildProp(){
 	file="$WORKDIR/Image/system/build.prop"
 	if [ ! -f "${file}.original" ]
 	then
-		sudo cp "$file" "${file}.original"
+		${SUDO} cp "$file" "${file}.original"
 	fi
 	grep -q "${prop}=" "$file"
 	if [ $? -eq 0 ]
 	then
 		cat "$file"| sed -e "s|^${prop}=.*$|${prop}=${value}|" > "$tempdir/build.prop"
-		sudo mv "$tempdir/build.prop" "$file"
+		${SUDO} mv "$tempdir/build.prop" "$file"
 	else
-		sudo echo "" >> "$file"
-		sudo echo "${prop}=${value}" >> "$file"
+		${SUDO} echo "" >> "$file"
+		${SUDO} echo "${prop}=${value}" >> "$file"
 	fi
 }
 

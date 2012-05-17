@@ -7,17 +7,17 @@ installApps_BB(){
 	SystemMount
 	cd "$WORKDIR/Image"
 
-	sudo cp "${PLUGINS}/installApps/bin/busybox" system/xbin/busybox 2>>"${LOGFILE}"
+	${SUDO} cp "${PLUGINS}/installApps/bin/busybox" system/xbin/busybox 2>>"${LOGFILE}"
 
 	for c in `cat "${PLUGINS}/installApps/bin/busybox.lst"`
 	do
 		dst="system/xbin/${c}"
 		if [ -f "$dst" ] || [ -L "$dst" ]
 		then
-			sudo mv "$dst" "${dst}#"
+			${SUDO} mv "$dst" "${dst}#"
 		fi
 
-		sudo ln -s /system/xbin/busybox ${dst} 2>>"${LOGFILE}"
+		${SUDO} ln -s /system/xbin/busybox ${dst} 2>>"${LOGFILE}"
 	done
 
 	SystemFixPermissions
@@ -27,11 +27,11 @@ installApps_SU(){
 	SystemMount
 	cd "$WORKDIR/Image"
 
-	sudo mv system/bin/su "system/bin/su#" 2>/dev/null 
-	sudo mv system/xbin/su "system/xbin/su#" 2>/dev/null
+	${SUDO} mv system/bin/su "system/bin/su#" 2>/dev/null 
+	${SUDO} mv system/xbin/su "system/xbin/su#" 2>/dev/null
 
-	sudo cp "${PLUGINS}/installApps/bin/su" system/xbin/su 2>>"${LOGFILE}"
-	sudo cp "${PLUGINS}/installApps/bin/Superuser.apk" system/app/ 2>>"${LOGFILE}"
+	${SUDO} cp "${PLUGINS}/installApps/bin/su" system/xbin/su 2>>"${LOGFILE}"
+	${SUDO} cp "${PLUGINS}/installApps/bin/Superuser.apk" system/app/ 2>>"${LOGFILE}"
 
 	SystemFixPermissions
 }
@@ -47,7 +47,7 @@ installApps_ExtractSystemLibs(){
 		if [ ! -z "${APKLIBFILES}" ]
 		then
 			pushd "${APKLIBDIR}" 2>/dev/null
-			sudo cp *.so "${WORKDIR}/Image/system/lib/"  2>>"${LOGFILE}"
+			${SUDO} cp *.so "${WORKDIR}/Image/system/lib/"  2>>"${LOGFILE}"
 			popd 2>/dev/null
 		fi
 	done
@@ -76,10 +76,10 @@ installApps_RemoveListApk(){
 			for (( j=0; j<${s}; j++ ))
 			do
 				so="${FILEARRAY[$j]}"
-				sudo rm "${WORKDIR}/Image/system//lib/$so" 2>>"${LOGFILE}"
+				${SUDO} rm "${WORKDIR}/Image/system//lib/$so" 2>>"${LOGFILE}"
 			done
 		fi
-		sudo rm "${WORKDIR}/Image/system/app/$f" 2>>"${LOGFILE}"
+		${SUDO} rm "${WORKDIR}/Image/system/app/$f" 2>>"${LOGFILE}"
 	done
 	popd
 
@@ -123,7 +123,7 @@ installApps_InstallListApk(){
 	for (( i=0; i<${apklistsize}; i++ ))
 	do
 		f=${apklist[$i]}
-		sudo cp $f "${WORKDIR}/Image/system/app/"  2>>"${LOGFILE}"
+		${SUDO} cp $f "${WORKDIR}/Image/system/app/"  2>>"${LOGFILE}"
 	done
 	popd
 	installApps_ExtractSystemLibs

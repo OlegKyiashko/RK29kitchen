@@ -11,7 +11,7 @@ flash_Process(){
 	mkparmimg
 
 	echo "Flashing IDB"
-	sudo rkflashtool w 0x0 0xa0 < parm.img 2>>${LOGFILE}
+	${SUDO} rkflashtool w 0x0 0xa0 < parm.img 2>>${LOGFILE}
 	PARAMFILE="parameter"
 	parameter_Parse
 
@@ -30,17 +30,17 @@ flash_Process(){
 		case $sname in
 			"boot" | "kernel" | "misc" | "recovery" | "system" )
 				echo "Flashing ${sname}"
-				sudo $cmd < Image/${sname}.img 2>>${LOGFILE}
+				${SUDO} $cmd < Image/${sname}.img 2>>${LOGFILE}
 				;;
 			"backup" )
 				#echo "Dumping ${sname}"
-				#sudo $cmd > ${sname}.img
+				#${SUDO} $cmd > ${sname}.img
 				;;
 			"cache" | "kpanic" | "userdata" )
 				;;
 		esac
 	done
-	sudo rkflashtool b 2>>${LOGFILE}
+	${SUDO} rkflashtool b 2>>${LOGFILE}
 
 
 	popd 2>/dev/null
@@ -60,7 +60,7 @@ flash_Main(){
 		bootloader_ParseBL
 	fi
 
-	sudo rkflashtool r 0x0 0xa0 >"$tempfile"
+	${SUDO} rkflashtool r 0x0 0xa0 >"$tempfile"
 	s=$(stat -c%s "$tempfile")
 	if [ $s -ne 81920 ]
 	then

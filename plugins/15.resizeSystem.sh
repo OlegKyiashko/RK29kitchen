@@ -12,13 +12,13 @@ resizeSystem_Process(){
 	dd if=/dev/zero of=system.new bs=1M count=${sz} 2>> "${LOGFILE}"
 	mkfs -t ${fs} -F -L system -m 0 system.new  2>> "${LOGFILE}"
 	mkdir system1  2>> "${LOGFILE}"
-	sudo mount system.new system1 2>> "${LOGFILE}"
+	${SUDO} mount system.new system1 2>> "${LOGFILE}"
 	cd system 2>> "${LOGFILE}"
-	sudo tar cf - * | sudo tar xvf - -C ../system1 2>> "${LOGFILE}"
+	${SUDO} tar cf - * | sudo tar xvf - -C ../system1 2>> "${LOGFILE}"
 	r=$?
 	cd ..
 	SystemUmount
-	sudo umount -f system1 2>> "${LOGFILE}"
+	${SUDO} umount -f system1 2>> "${LOGFILE}"
 	rm -rf system1
 
 	if [ $r -ne 0 ]
