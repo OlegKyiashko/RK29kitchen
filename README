@@ -37,7 +37,7 @@ Binary utilities (directory bin) can be compiled using:
 # cd src /
 # make all install
 Dependences: libusb-1.0, libusb-1.0-devel, libssl, libssl-devel, dialog, sudo, gcc
-To work actively used sudo (must be set up password-less mode) - need to modify the partition system
+To work actively used sudo (you can setup password-less mode) - need to modify the partition system (or run from root user)
 
 Use:
 [full_or_partial_path/]menu.sh [workdir]
@@ -96,7 +96,8 @@ Russian:
 # cd src/
 # make all install
 Зависимости: libusb-1.0, libusb-1.0-devel, libssl, libssl-devel, dialog, sudo, gcc
-Для работы активно используется sudo (должен быть настроен беспарольный режим) - необходим для модификации раздела system
+Для работы активно используется sudo (беспарольный режим желателен, но не обязателен) - необходим для модификации раздела system
+можно запускать от пользователя root
 
 Использование:
 [full_or_partial_path/]menu.sh [WorkDir]
