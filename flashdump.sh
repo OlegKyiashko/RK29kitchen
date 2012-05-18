@@ -1,5 +1,5 @@
 #!/bin/bash
-set -vx
+#set -vx
 BASEDIR=`dirname $0`
 pushd $BASEDIR 2>/dev/null
 BASEDIR=$(pwd)

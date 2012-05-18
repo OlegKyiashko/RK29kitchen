@@ -42,7 +42,7 @@ parameter_Parse(){
 			sname=${BASH_REMATCH[3]}
 		elif [[ "${PART}" =~ ${REGEX2} ]]
 		then
-			ssize='0'
+			ssize='-'
 			sstart=${BASH_REMATCH[1]}
 			sname=${BASH_REMATCH[2]}
 		else
