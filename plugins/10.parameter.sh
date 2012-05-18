@@ -142,7 +142,7 @@ parameter_Make(){
 	do
 		name=${SECTION[$n]}
 		ssize=${SSIZE[$n]}
-		if [ $ssize != '-' ]
+		if [ $name != "user" ]
 		then
 			a=`printf "${c}0x%08x@0x%08x(%s)" ${ssize} ${sstart} ${name}`
 			sstart=$[${sstart}+${ssize}]
