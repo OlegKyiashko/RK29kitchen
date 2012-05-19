@@ -21,6 +21,7 @@ flash_Process(){
 		sname=${SECTION[$n]}
 		ssize=${SSIZE[$n]}
 		sstart=${SSTART[$n]}
+		send=$[$sstart+$ssize]
 		if [ "$sname" == "user" ]
 		then
 			continue
@@ -29,17 +30,17 @@ flash_Process(){
 		case $sname in
 			"boot" | "kernel" | "misc" | "recovery" | "system" )
 				cmd=`printf "rkflashtool w 0x%08x 0x%08x " ${sstart} ${ssize}`
-				echo "Flashing ${sname}"
+				echo "Flashing ${sname} ($sstart - $send)"
 				${SUDO} $cmd < Image/${sname}.img
 				;;
 			"backup" )
 				cmd=`printf "rkflashtool w 0x%08x 0x%08x " ${sstart} ${ssize}`
-				echo "Flashing ${sname}"
+				echo "Flashing ${sname}} ($sstart - $send)"
 				${SUDO} $cmd < update.img
 				;;
 			"cache" | "kpanic" | "userdata" )
 				cmd=`printf "rkflashtool e 0x%08x 0x200 " ${sstart}`
-				echo "Erase ${sname}"
+				echo "Erase ${sname}} ($sstart - $send)"
 				${SUDO} $cmd
 				;;
 		esac

@@ -4,8 +4,8 @@
 TZ=UTC
 export TZ
 
-UID=$(id -u)
-if [ $UID -ne 0 ]
+USERID=$(id -u)
+if [ $USERID -ne 0 ]
 then
 	SUDO="sudo"
 fi
