@@ -30,7 +30,7 @@ chmod +x "${BINDIR}/"*
 pushd "${PLUGINS}"
 for file in `ls -1 [0-9][0-9]\.*\.sh`
 do
-        chmod +x $file
+	chmod +x $file
 	source $file
 done
 popd

@@ -56,7 +56,7 @@ dialogLOG(){
 }
 
 dialogUnpackFW(){
-        dialogOK "Please unpack firmware before"
+	dialogOK "Please unpack firmware before"
 }
 
 pressEnterToContinue(){

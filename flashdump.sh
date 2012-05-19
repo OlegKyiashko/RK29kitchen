@@ -24,8 +24,8 @@ chmod +x "${BINDIR}/"*
 
 for file in `ls -1 "${PLUGINS}"/[0-9][0-9]\.*\.sh`
 do
-        chmod +x $file
-        source $file
+	chmod +x $file
+	source $file
 done
 
 echo Check that your tablet is in the firmware flash mode and connected to computer
