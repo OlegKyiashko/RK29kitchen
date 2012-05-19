@@ -55,6 +55,10 @@ dialogLOG(){
 	dialog --colors --backtitle "${DIALOGBT}" --title "Show log" --textbox ""${LOGFILE}"" 20 70
 }
 
+dialogUnpackFW(){
+        dialogOK "Please unpack firmware before"
+}
+
 pressEnterToContinue(){
 	echo -n "Press Enter to continue..."
 	read a

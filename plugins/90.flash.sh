@@ -11,7 +11,7 @@ flash_Process(){
 	mkparmimg
 
 	echo "Flashing IDB"
-	${SUDO} rkflashtool w 0x0 0xa0 < parm.img 2>>${LOGFILE}
+	${SUDO} rkflashtool w 0x0 0x2000 < parm.img
 	PARAMFILE="parameter"
 	parameter_Parse
 
@@ -26,21 +26,25 @@ flash_Process(){
 			continue
 		fi
 
-		cmd=`printf "rkflashtool w 0x%08x 0x%08x " ${sstart} ${ssize}`
 		case $sname in
 			"boot" | "kernel" | "misc" | "recovery" | "system" )
+	                	cmd=`printf "rkflashtool w 0x%08x 0x%08x " ${sstart} ${ssize}`
 				echo "Flashing ${sname}"
-				${SUDO} $cmd < Image/${sname}.img 2>>${LOGFILE}
+				${SUDO} $cmd < Image/${sname}.img
 				;;
 			"backup" )
-				#echo "Dumping ${sname}"
-				#${SUDO} $cmd > ${sname}.img
+	                	cmd=`printf "rkflashtool w 0x%08x 0x%08x " ${sstart} ${ssize}`
+				echo "Flashing ${sname}"
+				${SUDO} $cmd < update.img
 				;;
 			"cache" | "kpanic" | "userdata" )
-				;;
+				cmd=`printf "rkflashtool e 0x%08x 0x200 " ${sstart}`
+				echo "Erase ${sname}"
+				${SUDO} $cmd
+                        	;;
 		esac
 	done
-	${SUDO} rkflashtool b 2>>${LOGFILE}
+	${SUDO} rkflashtool b
 
 
 	popd 2>/dev/null
@@ -51,7 +55,7 @@ flash_Main(){
 
 	if [ "${WORKMODE}" != "In progress" ]
 	then
-		dialogOK "Mode unsupported now"
+		dialogUnpackFW
 		return
 	fi
 
@@ -74,5 +78,5 @@ flash_Main(){
 			;;
 	esac
 
-	#flash_Process
+	flash_Process
 }
