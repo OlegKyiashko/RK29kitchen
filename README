@@ -36,7 +36,7 @@ With the user interface is implemented using utilities 'dialog'
 Binary utilities (directory bin) can be compiled using:
 # cd src /
 # make all install
-Dependences: libusb-1.0, libusb-1.0-devel, libssl, libssl-devel, dialog, sudo, gcc
+Dependences: libusb-1.0, libusb-1.0-devel, libssl, libssl-devel, dialog, sudo, cpio, zip, gcc
 To work actively used sudo (you can setup password-less mode) - need to modify the partition system (or run from root user)
 
 Use:
@@ -95,7 +95,7 @@ Russian:
 Бинарные утилиты (каталог bin) могут быть скомпилированы командой:
 # cd src/
 # make all install
-Зависимости: libusb-1.0, libusb-1.0-devel, libssl, libssl-devel, dialog, sudo, gcc
+Зависимости: libusb-1.0, libusb-1.0-devel, libssl, libssl-devel, dialog, sudo, cpio, zip, gcc
 Для работы активно используется sudo (беспарольный режим желателен, но не обязателен) - необходим для модификации раздела system
 можно запускать от пользователя root
 
