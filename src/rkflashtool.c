@@ -195,7 +195,7 @@ int main(int argc, char **argv) {
             if (offset % RKFT_DISPLAY == 0)
                 info("writing flash memory at offset 0x%08x\r", offset);
 
-            memset(buf, 0, RKFT_BLOCKSIZE);
+            memset(buf, RKFT_FILLBYTE, RKFT_BLOCKSIZE);
             /* we ignore here read() errors and pad up to given size */
             if (read(0, buf, RKFT_BLOCKSIZE) < 0) {};
 

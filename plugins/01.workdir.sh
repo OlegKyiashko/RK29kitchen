@@ -6,6 +6,7 @@ WORKTYPE=99
 WORKMODE="Undefined"
 
 workdir_Test(){
+	PARAMETER=""
 	cd "${WORKDIR}"
 
 	c=`ls -1 Image/zImage 2>/dev/null | wc -l `

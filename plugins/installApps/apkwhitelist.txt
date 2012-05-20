@@ -32,7 +32,6 @@ GoogleTTS.apk
 HTMLViewer.apk
 KeyChain.apk
 LatinIME.apk
-Launcher.*.apk
 LiveWallpapersPicker.apk
 MarketUpdater.apk
 MediaProvider.apk

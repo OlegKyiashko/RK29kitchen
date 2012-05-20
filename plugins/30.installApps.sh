@@ -176,9 +176,11 @@ installApps_Menu(){
 						;;
 					"clean")
 						installApps_RemoveSelectedApk
+						rm -rf ${tempdir}/*
 						;;
 					"apk")
 						installApps_InstallSelectedApk
+						rm -rf ${tempdir}/*
 						;;
 					"X")
 						return

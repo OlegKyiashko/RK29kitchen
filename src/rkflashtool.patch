@@ -1,0 +1,19 @@
+*** rkflashtool.c.original	2012-05-18 17:51:47.550082045 +0300
+--- rkflashtool.c	2012-05-18 17:53:17.800003051 +0300
+***************
+*** 195,201 ****
+              if (offset % RKFT_DISPLAY == 0)
+                  info("writing flash memory at offset 0x%08x\r", offset);
+  
+!             memset(buf, 0, RKFT_BLOCKSIZE);
+              /* we ignore here read() errors and pad up to given size */
+              if (read(0, buf, RKFT_BLOCKSIZE) < 0) {};
+  
+--- 195,201 ----
+              if (offset % RKFT_DISPLAY == 0)
+                  info("writing flash memory at offset 0x%08x\r", offset);
+  
+!             memset(buf, RKFT_FILLBYTE, RKFT_BLOCKSIZE);
+              /* we ignore here read() errors and pad up to given size */
+              if (read(0, buf, RKFT_BLOCKSIZE) < 0) {};
+  

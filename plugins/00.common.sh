@@ -4,8 +4,8 @@
 TZ=UTC
 export TZ
 
-UID=$(id -u)
-if [ $UID -ne 0 ]
+USERID=$(id -u)
+if [ $USERID -ne 0 ]
 then
 	SUDO="sudo"
 fi
@@ -53,6 +53,10 @@ dialogLOG(){
 	dialogBT
 	dialog --colors --backtitle "${DIALOGBT}" --msgbox "$1" 8 70
 	dialog --colors --backtitle "${DIALOGBT}" --title "Show log" --textbox ""${LOGFILE}"" 20 70
+}
+
+dialogUnpackFW(){
+	dialogOK "Please unpack firmware before"
 }
 
 pressEnterToContinue(){
