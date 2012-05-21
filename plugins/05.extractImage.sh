@@ -9,7 +9,7 @@ system='system'
 zimage='zImage'
 
 extractImage_ExtractFiles(){
-	pushd Image
+	pushd Image >/dev/null
 
 	mkdir -p $ramdisk
 	zcat $initrd | ( cd $ramdisk; cpio -idm )
@@ -36,11 +36,11 @@ extractImage_ExtractFiles(){
 	then
 		strings recovery-${zimage} |grep "Linux version" >_recovery-kernel.version
 	fi
-	popd
+	popd >/dev/null
 }
 
 extractImage_ExtractBootImg(){
-	pushd Image
+	pushd Image >/dev/null
 	FileSignature boot.img
 	case $COMMONFILESIGNATURE in
 		"ANDR")
@@ -52,10 +52,10 @@ extractImage_ExtractBootImg(){
 			;;
 		*)
 			dialogOK "Unknown boot.img type :("
-			popd
+			popd >/dev/null
 			exit 1
 	esac
-	popd
+	popd >/dev/null
 }
 
 extractImage_ExtractKernelImg(){
@@ -64,7 +64,7 @@ extractImage_ExtractKernelImg(){
 		return
 	fi
 
-	pushd Image
+	pushd Image >/dev/null
 	FileSignature kernel.img
 	case $COMMONFILESIGNATURE in
 		"KRNL")
@@ -72,10 +72,10 @@ extractImage_ExtractKernelImg(){
 			;;
 		*)
 			dialogOK "Unknown kernel.img type :("
-			popd
+			popd >/dev/null
 			exit 1
 	esac
-	popd
+	popd >/dev/null
 }
 
 extractImage_ExtractRecoveryImg(){
@@ -84,7 +84,7 @@ extractImage_ExtractRecoveryImg(){
 		return
 	fi
 
-	pushd Image
+	pushd Image >/dev/null
 	FileSignature recovery.img
 	case $COMMONFILESIGNATURE in
 		"KRNL")
@@ -96,17 +96,17 @@ extractImage_ExtractRecoveryImg(){
 			;;
 		*)
 			dialogOK "Unknown recovery.img type :("
-			popd
+			popd >/dev/null
 			exit 1
 	esac
-	popd
+	popd >/dev/null
 }
 
 extractImage_ExtractProcess(){
-	pushd "$WORKDIR" 2>/dev/null
+	pushd "$WORKDIR" >/dev/null
 	BackupFile package-file
 	cat ${COMMONBACKUPFILE}| sed -e "s/#kernel/kernel/" > package-file
-	popd 2>/dev/null
+	popd >/dev/null
 
 	extractImage_ExtractBootImg
 	extractImage_ExtractKernelImg
@@ -116,7 +116,7 @@ extractImage_ExtractProcess(){
 }
 
 extractImage_ExtractImage(){
-	pushd "$WORKDIR"
+	pushd "$WORKDIR" >/dev/null
 	cp "${PLUGINS}/extractImage/bootimg.cfg" Image/
 	cp "${PLUGINS}/extractImage/recovery.cfg" Image/
 
@@ -133,7 +133,7 @@ extractImage_ExtractImage(){
 		BackupFile package-file
 		cat ${COMMONBACKUPFILE}| sed -e "s/${BOOTLOADER}/${bl}/" > package-file
 	fi
-	popd
+	popd >/dev/null
 	extractImage_ExtractProcess
 }
 

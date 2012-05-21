@@ -186,6 +186,8 @@ parameter_FileSelect(){
 }
 
 parameter_Menu(){
+	cd "${WORKDIR}"
+
 	if [ "${WORKMODE}" != "In progress" ] && [ "${WORKMODE}" != "Image" ]
 	then
 		dialogOK "You should extract image files before continue..."

@@ -11,7 +11,7 @@ img='update.img'
 MADEIMAGE=0
 
 makeUpdateImage_MkInitRD(){
-	pushd "${WORKDIR}/Image/"
+	pushd "${WORKDIR}/Image/" >/dev/null
 
 	BackupFile "${initrd}"
 	BackupFile boot.img
@@ -36,7 +36,7 @@ makeUpdateImage_MkInitRD(){
 
 	mkkrnlimg -a "${zimage}" kernel.img
 
-	popd
+	popd >/dev/null
 }
 
 makeUpdateImage_Image(){

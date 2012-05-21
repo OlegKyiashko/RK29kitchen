@@ -4,13 +4,13 @@
 MenuAdd "Change bootloader" "bootloader_BL"
 
 bootloader_ParseBL(){
-	pushd "$WORKDIR" 2>/dev/null
+	pushd "$WORKDIR" >/dev/null
 	BOOTLOADER=`grep bootloader package-file |cut -f2|tr -d "\n\r"`
-	popd 2>/dev/null
+	popd >/dev/null
 }
 
 bootloader_ListBL(){
-	pushd "${BASEDIR}/plugins/bootloader"
+	pushd "${BASEDIR}/plugins/bootloader" >/dev/null
 	n=0
 
 	if [ ! -f "${BOOTLOADER}" ]
@@ -25,11 +25,11 @@ bootloader_ListBL(){
 		BL="$BL \"${FILEARRAY[i]}\" \"\""
 	done
 	BL[$n]="\"Exit\" \"\""
-	popd
+	popd >/dev/null
 }
 
 bootloader_SelectBL(){
-	pushd "${BASEDIR}/plugins/bootloader"
+	pushd "${BASEDIR}/plugins/bootloader" >/dev/null
 	FilesMenuDlg "*bin" "Change bootloader" "Current bootloader: $BOOTLOADER\nChoose bootloader:"
 	case $? in
 		0)
@@ -42,13 +42,13 @@ bootloader_SelectBL(){
 			then
 				cp "${BASEDIR}/plugins/bootloader/$bl" "${WORKDIR}"
 			fi
-			pushd "$WORKDIR"
+			pushd "$WORKDIR"  >/dev/null
 			BackupFile package-file
 			cat ${COMMONBACKUPFILE}| sed -e "s/${BOOTLOADER}/${bl}/" > package-file
-			popd
+			popd >/dev/null
 			;;
 	esac
-	popd
+	popd >/dev/null
 }
 
 bootloader_BL(){

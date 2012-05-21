@@ -1,7 +1,6 @@
 21.5.2.apk
 BooksProvider.apk
 bydr.apk
-Development.apk
 fndxn.apk
 Gfan.cube.0.7.1.TY.apk
 OpenWnn.apk

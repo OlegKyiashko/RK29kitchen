@@ -8,7 +8,7 @@ resizeSystem_Process(){
 	fs=$2
 
 	SystemMount
-	pushd Image 2>> "${LOGFILE}"
+	pushd Image >/dev/null
 	dd if=/dev/zero of=system.new bs=1M count=${sz} 2>> "${LOGFILE}"
 	mkfs -t ${fs} -F -L system -m 0 system.new  2>> "${LOGFILE}"
 	mkdir system1  2>> "${LOGFILE}"
@@ -29,7 +29,7 @@ resizeSystem_Process(){
 		mv system.new system.img  2>> "${LOGFILE}"
 	fi
 	SystemMount
-	popd 2>> "${LOGFILE}"
+	popd >/dev/null
 }
 
 resizeSystem_ProcessDlg(){

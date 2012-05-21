@@ -96,14 +96,14 @@ FileSignature(){
 }
 
 SystemFsck(){
-	pushd "$WORKDIR/Image"  2>/dev/null
+	pushd "$WORKDIR/Image"  >/dev/null
 	${SUDO} sync
 	${SUDO} /sbin/fsck.ext3 -yf system.img 2>&1 >> "$LOGFILE"
-	popd
+	popd >/dev/null
 }
 
 SystemMount(){
-	pushd "$WORKDIR/Image"  2>/dev/null
+	pushd "$WORKDIR/Image"  >/dev/null
 	if [ ! -d "system" ]
 	then
 		mkdir "system"
@@ -113,18 +113,18 @@ SystemMount(){
 		SystemFsck
 		${SUDO} mount system.img system -o loop 2>>"${LOGFILE}"
 	fi
-	popd  2>/dev/null
+	popd  >/dev/null
 }
 
 SystemUmount(){
-	pushd "$WORKDIR/Image"  2>/dev/null
+	pushd "$WORKDIR/Image"  >/dev/null
 	if [ -d "system" ] && [ -f "system/build.prop" ]
 	then
 		${SUDO} sync
 		${SUDO} umount system  2>>"${LOGFILE}"
 		SystemFsck
 	fi
-	popd  2>/dev/null
+	popd  >/dev/null
 }
 
 SetDirPermissions(){
@@ -149,13 +149,13 @@ SetFilePermissions(){
 
 SystemFixPermissions(){
 	SystemMount
-	pushd "$WORKDIR/Image"  2>/dev/null
+	pushd "$WORKDIR/Image"  >/dev/null
 	SetDirPermissions system/app/ 0 0 0644 0755
 	SetDirPermissions system/lib/ 0 0 0644 0755
 	SetDirPermissions system/bin/ 0 0 0755 0755
 	SetDirPermissions system/xbin/ 0 0 0755 0755
 	${SUDO} chmod +s system/xbin/su
-	popd 2>/dev/null
+	popd >/dev/null
 }
 
 ApkLibExtract(){
@@ -166,9 +166,11 @@ ApkLibExtract(){
 	then
 		return
 	fi
+	echo "Process $apk ..."
 	APKLIBDIR="$tempdir/$apk/"
+	mkdir -p "$APKLIBDIR" 2>/dev/null
 	unzip "$apk" -d "$APKLIBDIR" "*.so" 2>>"${LOGFILE}" >>"${LOGFILE}"
-	pushd "$APKLIBDIR"
+	pushd "$APKLIBDIR" >/dev/null
 	if [ -d lib/armeabi-v7a ]
 	then
 		mv lib/armeabi-v7a/*.so . 2>>"${LOGFILE}"
@@ -177,8 +179,8 @@ ApkLibExtract(){
 		mv lib/armeabi/*.so . 2>>"${LOGFILE}"
 	fi
 	rm -rf lib 2>/dev/null
-	APKLIBFILES=$(ls -1 *.so)
-	popd 2>/dev/null
+	APKLIBFILES=$(ls -1 *.so 2>/dev/null)
+	popd >/dev/null
 }
 
 DirToArray(){
@@ -193,7 +195,7 @@ FileToArray(){
 	fn="$1"
 	ifs=$IFS
 	IFS=$'\n'
-	FILEARRAY=( `sort $fn|sed -e 's/" *"/\n/g'|sed -e 's/"//g'` )
+	FILEARRAY=( `cat $fn|sed -e 's/" *"/\n/g'|sed -e 's/"//g'` )
 	IFS=$ifs
 }
 

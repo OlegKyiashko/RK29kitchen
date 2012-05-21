@@ -4,7 +4,7 @@
 MenuAdd "Flashing update to tablet" "flash_Main"
 
 flash_Process(){
-	pushd "$WORKDIR" 2>/dev/null
+	pushd "$WORKDIR" >/dev/null
 
 	SystemUmount
 
@@ -50,7 +50,7 @@ flash_Process(){
 	${SUDO} rkflashtool b
 
 
-	popd 2>/dev/null
+	popd >/dev/null
 }
 
 flash_Dump(){
@@ -87,6 +87,9 @@ flash_Dump(){
 				;;
 			"cache" | "kpanic" | "userdata" | "user" )
 				;;
+                        *)
+                                echo OOPS $sname
+                                ;;
 		esac
 	done
 }

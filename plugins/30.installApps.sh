@@ -37,7 +37,7 @@ installApps_SU(){
 }
 
 installApps_ExtractSystemLibs(){
-	pushd "${WORKDIR}/Image/system/app/" 2>/dev/null
+	pushd "${WORKDIR}/Image/system/app/" >/dev/null
 	DirToArray "*.apk"
 	n=${#FILEARRAY[@]}
 	for (( i=0; i<${n}; i++ ))
@@ -46,18 +46,18 @@ installApps_ExtractSystemLibs(){
 		ApkLibExtract "$f"
 		if [ ! -z "${APKLIBFILES}" ]
 		then
-			pushd "${APKLIBDIR}" 2>/dev/null
+			pushd "${APKLIBDIR}" >/dev/null
 			${SUDO} cp *.so "${WORKDIR}/Image/system/lib/"  2>>"${LOGFILE}"
-			popd 2>/dev/null
+			popd >/dev/null
 		fi
 	done
-	popd 2>/dev/null
+	popd >/dev/null
 }
 
 installApps_RemoveListApk(){
 	SystemMount
 	apklist=("${!1}")
-	pushd "${WORKDIR}/Image/system/app/"
+	pushd "${WORKDIR}/Image/system/app/" >/dev/null
 	apklistsize=${#apklist[@]}
 	for (( i=0; i<${apklistsize}; i++ ))
 	do
@@ -69,9 +69,9 @@ installApps_RemoveListApk(){
 		ApkLibExtract "$f"
 		if [ ! -z "${APKLIBFILES}" ]
 		then
-			pushd "${APKLIBDIR}" 2>/dev/null
+			pushd "${APKLIBDIR}" >/dev/null
 			DirToArray "*.so"
-			popd 2>/dev/null
+			popd >/dev/null
 			s=${#FILEARRAY[@]}
 			for (( j=0; j<${s}; j++ ))
 			do
@@ -81,7 +81,7 @@ installApps_RemoveListApk(){
 		fi
 		${SUDO} rm "${WORKDIR}/Image/system/app/$f" 2>>"${LOGFILE}"
 	done
-	popd
+	popd >/dev/null
 
 	installApps_ExtractSystemLibs
 	SystemFixPermissions
@@ -90,9 +90,10 @@ installApps_RemoveListApk(){
 installApps_RemoveAllApk(){
 	SystemMount
 
-	pushd "${WORKDIR}/Image/system/app/"
+	pushd "${WORKDIR}/Image/system/app/" >/dev/null
 	ls -1|grep -f "${PLUGINS}/installApps/apkblacklist.txt" > "$tempfile"
 	FileToArray "$tempfile"
+	popd >/dev/null
 
 	installApps_RemoveListApk FILEARRAY[@]
 }
@@ -100,14 +101,14 @@ installApps_RemoveAllApk(){
 installApps_RemoveSelectedApk(){
 	SystemMount
 
-	pushd "${WORKDIR}/Image/system/app/"
+	pushd "${WORKDIR}/Image/system/app/" >/dev/null
 	ls -1|grep -f "${PLUGINS}/installApps/apkblacklist.txt" > "$tempfile"
 	FileToArray "$tempfile"
 	bl=("${FILEARRAY[@]}")
 	ls -1|grep -v -f "${PLUGINS}/installApps/apkwhitelist.txt"|grep -v -f "${PLUGINS}/installApps/apkblacklist.txt" > "$tempfile"
 	FileToArray "$tempfile"
 	gl=("${FILEARRAY[@]}")
-
+	popd  >/dev/null
 	ListCheckboxDlg bl[@] gl[@] "Remove system apps" "Choose apk files:"
 	if [ $? -eq 0 ]
 	then
@@ -118,34 +119,34 @@ installApps_RemoveSelectedApk(){
 installApps_InstallListApk(){
 	SystemMount
 	apklist=("${!1}")
-	pushd "${PLUGINS}/installApps/apk"
+	pushd "${PLUGINS}/installApps/apk" >/dev/null
 	apklistsize=${#apklist[@]}
 	for (( i=0; i<${apklistsize}; i++ ))
 	do
 		f=${apklist[$i]}
 		${SUDO} cp $f "${WORKDIR}/Image/system/app/"  2>>"${LOGFILE}"
 	done
-	popd
+	popd >/dev/null
 	installApps_ExtractSystemLibs
 	SystemFixPermissions
 }
 
 installApps_InstallAllApk(){
-	pushd "${PLUGINS}/installApps/apk"
+	pushd "${PLUGINS}/installApps/apk" >/dev/null
 	DirToArray "*apk"
 	installApps_InstallListApk FILEARRAY[@]
-	popd
+	popd >/dev/null
 }
 
 installApps_InstallSelectedApk(){
-	pushd "${PLUGINS}/installApps/apk"
+	pushd "${PLUGINS}/installApps/apk" >/dev/null
 	DirToArray "*apk"
 	ListCheckboxDlg FILEARRAY[@] "" "Install apps as system" "Choose apk files:"
 	if [ $? -eq 0 ]
 	then
 		installApps_InstallListApk FILEARRAY[@]
 	fi
-	popd
+	popd >/dev/null
 }
 
 installApps_Menu(){

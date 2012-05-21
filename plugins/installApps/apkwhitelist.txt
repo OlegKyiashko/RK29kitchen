@@ -64,3 +64,4 @@ VideoEditor.apk
 VoiceSearch.apk
 VpnDialogs.apk
 WAPPushManager.apk
+Superuser.apk
