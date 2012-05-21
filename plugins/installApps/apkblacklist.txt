@@ -20,3 +20,4 @@ UCLAQ.apk
 VideoEditor.apk
 xunfei.apk
 yinyue.apk
+flashplayer

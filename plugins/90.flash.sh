@@ -8,10 +8,14 @@ flash_Process(){
 
 	SystemUmount
 
-	mkparmimg
+	rkcrc -p parameter parm.img
 
 	echo "Flashing IDB"
-	${SUDO} rkflashtool w 0x0 0x2000 < parm.img
+	${SUDO} rkflashtool w 0x0 0x20 < parm.img
+	${SUDO} rkflashtool w 0x20 0x20 < parm.img
+	${SUDO} rkflashtool w 0x40 0x20 < parm.img
+	${SUDO} rkflashtool w 0x60 0x20 < parm.img
+	${SUDO} rkflashtool w 0x80 0x20 < parm.img
 	PARAMFILE="parameter"
 	parameter_Parse
 
@@ -38,7 +42,7 @@ flash_Process(){
 			"backup" )
 				cmd=`printf "rkflashtool w 0x%08x 0x%08x " ${sstart} ${ssize}`
 				echo "Flashing ${sname} ($sstart - $send)"
-				#${SUDO} $cmd < update.img
+				${SUDO} $cmd < update.img.tmp
 				;;
 			"cache" | "kpanic" | "userdata" )
 				cmd=`printf "rkflashtool e 0x%08x 0x200 " ${sstart}`

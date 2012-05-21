@@ -58,7 +58,7 @@ makeUpdateImage_Image(){
 
 	BackupFile ${img}
 	img_maker $BOOTLOADER ${img}.tmp ${img}
-	rm ${img}.tmp
+	#rm ${img}.tmp
 	#        zip update.zip update.img
 	MADEIMAGE=1
 }
