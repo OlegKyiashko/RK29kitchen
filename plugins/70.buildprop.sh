@@ -66,7 +66,7 @@ buildprop_Menu(){
 	while [ true ]
 	do
 		dialogBT
-		dialog --colors --backtitle "${DIALOGBT}" --title "Install system apps" --menu "Select:" 20 70 10 \
+		dialog --colors --backtitle "${DIALOGBT}" --title "Modify build.prop" --menu "Select:" 20 70 10 \
 			"tz" "Change default timezone" \
 			"lc" "Change default locale" \
 			"dateformat" "Change default dateformat" \
