@@ -1,15 +1,15 @@
 #!/bin/bash
-set -vx 
+#set -vx 
 
 BASEDIR=`dirname $0`
-pushd "$BASEDIR"
+pushd "$BASEDIR" >/dev/null
 BASEDIR=`pwd`
-popd
+popd >/dev/null
 
 WORKDIR=${1:-`pwd`}
-pushd "$WORKDIR"
+pushd "$WORKDIR" >/dev/null
 WORKDIR=`pwd`"/"
-popd
+popd >/dev/null
 
 if [ "${WORKDIR}" == "${BASEDIR}" ]
 then
@@ -23,17 +23,17 @@ PATH="${BINDIR}":$PATH
 
 export BASEDIR WORKDIR BINDIR LOGFILE PATH PLUGINS
 
-rm "${LOGFILE}"
+rm "${LOGFILE}" 2>/dev/null
 touch "${LOGFILE}"
 chmod +x "${BINDIR}/"*
 
-pushd "${PLUGINS}"
+pushd "${PLUGINS}" >/dev/null
 for file in `ls -1 [0-9][0-9]\.*\.sh`
 do
 	chmod +x $file
 	source $file
 done
-popd
+popd >/dev/null
 
 MenuAdd "Exit" "exit 0"
 

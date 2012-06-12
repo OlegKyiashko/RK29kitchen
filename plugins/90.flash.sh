@@ -8,10 +8,16 @@ flash_Process(){
 
 	SystemUmount
 
-	mkparmimg
+	rkcrc -p parameter parm.img
 
+	echo "Erasing IDB"
+	${SUDO} rkflashtool e 0x0 0x1000
 	echo "Flashing IDB"
-	${SUDO} rkflashtool w 0x0 0x2000 < parm.img
+	${SUDO} rkflashtool w 0x0 0x20 < parm.img
+	${SUDO} rkflashtool w 0x20 0x20 < parm.img
+	${SUDO} rkflashtool w 0x40 0x20 < parm.img
+	${SUDO} rkflashtool w 0x60 0x20 < parm.img
+	${SUDO} rkflashtool w 0x80 0x20 < parm.img
 	PARAMFILE="parameter"
 	parameter_Parse
 
@@ -38,7 +44,7 @@ flash_Process(){
 			"backup" )
 				cmd=`printf "rkflashtool w 0x%08x 0x%08x " ${sstart} ${ssize}`
 				echo "Flashing ${sname} ($sstart - $send)"
-				#${SUDO} $cmd < update.img
+				${SUDO} $cmd < update.img.tmp
 				;;
 			"cache" | "kpanic" | "userdata" )
 				cmd=`printf "rkflashtool e 0x%08x 0x200 " ${sstart}`
@@ -81,11 +87,11 @@ flash_Dump(){
 				echo "Dumping ${sname} ($cmd)"
 				${SUDO} $cmd > Image/${sname}.img 2>>${LOGFILE}
 				;;
-			"backup" )
+			"0backup" )
 				echo "Dumping ${sname} ($cmd)"
 				${SUDO} $cmd > ${sname}.img 2>>${LOGFILE}
 				;;
-			"cache" | "kpanic" | "userdata" | "user" )
+			"0cache" | "0kpanic" | "0userdata" | "0user" )
 				;;
                         *)
                                 echo OOPS $sname
@@ -106,10 +112,10 @@ flash_Main(){
 		bootloader_ParseBL
 	fi
 
-	if [ $MADEIMAGE -eq 0 ]
-	then
-		makeUpdateImage_Process
-	fi
+#	if [ $MADEIMAGE -eq 100 ]
+#	then
+#		makeUpdateImage_Process
+#	fi
 
 	dialogOK "Power off you tablet.\nPress the VOL- button and connect usb cable to PC and tablet\nRelease button"
 

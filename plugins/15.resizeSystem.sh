@@ -10,7 +10,7 @@ resizeSystem_Process(){
 	SystemMount
 	pushd Image >/dev/null
 	dd if=/dev/zero of=system.new bs=1M count=${sz} 2>> "${LOGFILE}"
-	mkfs -t ${fs} -F -L system -m 0 system.new  2>> "${LOGFILE}"
+	mkfs -t ${fs} -b 1024 -F -I 128 -j -L system -m 1 system.new  2>> "${LOGFILE}"
 	mkdir system1  2>> "${LOGFILE}"
 	${SUDO} mount system.new system1 2>> "${LOGFILE}"
 	cd system 2>> "${LOGFILE}"
@@ -38,21 +38,21 @@ resizeSystem_ProcessDlg(){
 	ftype=`file Image/system.img`
 	fs="ext3"
 
-	#	dialogBT
-	#	dialog --colors --backtitle "${DIALOGBT}" --title "Resize system.img (/system partition)" \
-		#		--menu "Old system.img is: ${ftype}\nSelect new system.img fs type:" 20 70 10 \
-		#		"ext3" "Use fs type ext3"\
-		#		"ext4" "Use fs type ext4"\
-		#		"X" "Exit" 2>$tempfile
-	#	case $? in
-	#		0)
-	#			fs=`cat $tempfile`
-	#			if [ "${fs}" == "X" ]
-	#			then
-	#				return
-	#			fi
-	#			;;
-	#	esac
+	dialogBT
+	dialog --colors --backtitle "${DIALOGBT}" --title "Resize system.img (/system partition)" \
+		--menu "Old system.img is: ${ftype}\nSelect new system.img fs type:" 20 70 10 \
+			"ext3" "Use fs type ext3"\
+			"ext4" "Use fs type ext4"\
+			"X" "Exit" 2>$tempfile
+	case $? in
+		0)
+			fs=`cat $tempfile`
+			if [ "${fs}" == "X" ]
+			then
+				return
+			fi
+			;;
+	esac
 
 	dialogYN "New file fs: ${fs}\nNew size: ${sz}MB(1MB will reserved)\nResize system.img file?"
 	case $? in
