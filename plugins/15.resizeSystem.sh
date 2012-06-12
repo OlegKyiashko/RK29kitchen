@@ -10,7 +10,9 @@ resizeSystem_Process(){
 	SystemMount
 	pushd Image >/dev/null
 	dd if=/dev/zero of=system.new bs=1M count=${sz} 2>> "${LOGFILE}"
-	mkfs -t ${fs} -b 1024 -F -I 128 -j -L system -m 1 system.new  2>> "${LOGFILE}"
+#	mkfs -t ${fs} -b 1024 -F -I 128 -j -L system -m 1 system.new  2>> "${LOGFILE}"
+        mke2fs -t ${fs} -F -m 0 -b 1024 -L system -I 128 -g 8032 -J size=7 -O has_journal,sparse_super,^resize_inode,dir_index,filetype,^ext_attr system.new
+        tune2fs -o ^user_xattr,^acl system.new
 	mkdir system1  2>> "${LOGFILE}"
 	${SUDO} mount system.new system1 2>> "${LOGFILE}"
 	cd system 2>> "${LOGFILE}"
