@@ -13,23 +13,26 @@ MADEIMAGE=0
 makeUpdateImage2_MkInitRD(){
 	pushd "${WORKDIR}/Image/" >/dev/null
 
-	BackupFile "${initrd}"
-	BackupFile boot.img
+        if [ $1 -ne 0 ]
+        then
+        	BackupFile "${initrd}"
+        	BackupFile boot.img
 
-	cd $ramdisk
-	find . -type f -name "*#" -print0 | xargs -0 ${SUDO} rm -f 
-	find . -exec touch -d "1970-01-01 01:00" {} \;
-	find . ! -name "."|sort|cpio -oa -H newc --owner=root:root|gzip -n >../${initrd}
-	cd ..
+        	cd $ramdisk
+        	find . -type f -name "*#" -print0 | xargs -0 ${SUDO} rm -f 
+        	find . -exec touch -d "1970-01-01 01:00" {} \;
+        	find . ! -name "."|sort|cpio -oa -H newc --owner=root:root|gzip -n >../${initrd}
+        	cd ..
 
-	BackupFile "recovery-${initrd}"
-	BackupFile recovery.img
+        	BackupFile "recovery-${initrd}"
+        	BackupFile recovery.img
 
-	cd recovery-$ramdisk
-	find . -type f -name "*#" -print0 | xargs -0 ${SUDO} rm -f 
-	find . -exec touch -d "1970-01-01 01:00" {} \;
-	find . ! -name "."|sort|cpio -oa -H newc --owner=root:root|gzip -n >../recovery-${initrd}
-	cd ..
+        	cd recovery-$ramdisk
+        	find . -type f -name "*#" -print0 | xargs -0 ${SUDO} rm -f 
+        	find . -exec touch -d "1970-01-01 01:00" {} \;
+        	find . ! -name "."|sort|cpio -oa -H newc --owner=root:root|gzip -n >../recovery-${initrd}
+        	cd ..
+        fi
 
 #	abootimg --create boot.img -f bootimg.cfg -k $zimage -r ${initrd}
 #	abootimg --create recovery.img -f recovery.cfg -k $zimage -r recovery-${initrd}
@@ -66,7 +69,7 @@ makeUpdateImage2_Image(){
 }
 
 makeUpdateImage2_Process(){
-	makeUpdateImage2_MkInitRD
+	makeUpdateImage2_MkInitRD $1
 	makeUpdateImage2_Image
 }
 
@@ -74,7 +77,9 @@ makeUpdateImage2_Main(){
 	cd "$WORKDIR"
 	case ${WORKMODE} in
 		"In progress")
-			makeUpdateImage2_Process
+                        dialogYN "Use original boot and recovery initrd images?"
+                        rebuild=$?
+			makeUpdateImage2_Process $rebuild
 			;;
 		*)
 			dialogOK "Mode unsupported now!"

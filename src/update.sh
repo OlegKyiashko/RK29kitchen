@@ -15,6 +15,6 @@ wget https://github.com/naobsd/rkutils/zipball/master -O $fn
 
 svn export --force https://rkflashtool.svn.sourceforge.net/svnroot/rkflashtool/trunk/rkflashtool.c
 
-patch <rkflashtool.patch
+#patch <rkflashtool.patch
 
 make clean all install

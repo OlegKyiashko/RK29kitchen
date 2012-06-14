@@ -1,7 +1,7 @@
 #!/bin/bash
 #set -vx
 
-MenuAdd "Change bootloader" "bootloader_BL"
+#MenuAdd "Change bootloader" "bootloader_BL"
 
 bootloader_ParseBL(){
 	pushd "$WORKDIR" >/dev/null

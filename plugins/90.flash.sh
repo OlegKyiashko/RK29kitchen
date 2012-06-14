@@ -21,6 +21,8 @@ flash_Process(){
 	PARAMFILE="parameter"
 	parameter_Parse
 
+        bs=512
+
 	sz=${#SECTION[@]}
 	for (( n=0; n<${#SECTION[@]}; n++ ))
 	do
@@ -32,24 +34,32 @@ flash_Process(){
 
 		ssize=${SSIZE[$n]}
 		sstart=${SSTART[$n]}
-		send=$[$sstart+$ssize]
-		send=$(printf 0x%08x $send)
 
 		case $sname in
 			"boot" | "kernel" | "misc" | "recovery" | "system" )
-				cmd=`printf "rkflashtool w 0x%08x 0x%08x " ${sstart} ${ssize}`
-				echo "Flashing ${sname} ($sstart - $send)"
-				${SUDO} $cmd < Image/${sname}.img
+				fn="Image/${sname}.img"
+				s=$(stat -c%s "$fn")
+				s=$[($s+$bs)/$bs]
+				send=$[$sstart+$s]
+				send=$(printf 0x%08x $send)
+				cmd=`printf "rkflashtool w 0x%08x 0x%08x " ${sstart} ${s}`
+				echo "Flashing ${sname} ($sstart  $send)"
+				${SUDO} $cmd < ${fn}
 				;;
 			"backup" )
-				cmd=`printf "rkflashtool w 0x%08x 0x%08x " ${sstart} ${ssize}`
-				echo "Flashing ${sname} ($sstart - $send)"
-				${SUDO} $cmd < update.img.tmp
+				fn="update.img.tmp"
+				s=$(stat -c%s "$fn")
+				s=$[($s+$bs)/$bs]
+				send=$[$sstart+$s]
+				send=$(printf 0x%08x $send)
+				cmd=`printf "rkflashtool w 0x%08x 0x%08x " ${sstart} ${s}`
+				echo "Flashing ${sname} ($sstart  $send)"
+				${SUDO} $cmd < ${fn}
 				;;
 			"cache" | "kpanic" | "userdata" )
 				cmd=`printf "rkflashtool e 0x%08x 0x200 " ${sstart}`
-				echo "Erase ${sname} ($sstart - $send)"
-				${SUDO} $cmd
+				echo "Erase ${sname} ($sstart )"
+				#${SUDO} $cmd
 				;;
 		esac
 	done

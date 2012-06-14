@@ -164,6 +164,8 @@ installApps_Menu(){
 			"busybox" "Install busybox" \
 			"su" "Install su" \
 			"apk" "Install apps as system" \
+			"lib" "Restore lib from apk" \
+			"fix" "Fix permissions" \
 			"X" "Exit" 2> $tempfile
 		case $? in
 			0)
@@ -181,6 +183,15 @@ installApps_Menu(){
 						;;
 					"apk")
 						installApps_InstallSelectedApk
+						rm -rf ${tempdir}/*
+						;;
+					"lib")
+						installApps_ExtractSystemLibs
+						SystemFixPermissions
+						rm -rf ${tempdir}/*
+						;;
+					"fix")
+						SystemFixPermissions
 						rm -rf ${tempdir}/*
 						;;
 					"X")

@@ -30,6 +30,7 @@ extractImage_ExtractFiles(){
 	${SUDO} find $system -xtype f -print0|xargs -0 ls -ln --time-style="+%F %T"|sed -e's/ ${system}/ \/system/' >_system.lst
 	${SUDO} find $system -xtype f -print0|xargs -0 ls -ln --time-style="+"|sed -e's/ ${system}/ \/system/' >_system.lst2
 	${SUDO} find $system -xtype f -print0|xargs -0 ls -l|awk '{print $5 "\t" $9}'|sed -e's/ ${system}/ \/system/' >_system.lst3
+	SystemUmount
 
 	strings ${zimage} |grep "Linux version" >_kernel.version
 	if [ -f recovery-$zimage ]
@@ -139,9 +140,9 @@ extractImage_ExtractImage(){
 
 extractImage_ExtractImgFile(){
 	IMGFILE="$1"
-	img_unpack "${IMGFILE}" "${IMGFILE}.tmp"
-	afptool -unpack "${IMGFILE}.tmp" .
-	rm "${IMGFILE}.tmp"
+	img_unpack "${IMGFILE}" "update.img.tmp"
+	afptool -unpack "update.img.tmp" .
+#	rm "update.img.tmp"
 	extractImage_ExtractProcess
 }
 
