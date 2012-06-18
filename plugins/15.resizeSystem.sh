@@ -12,24 +12,25 @@ resizeSystem_Process(){
 	dd if=/dev/zero of=system.new bs=1M count=${sz} 2>> "${LOGFILE}"
 #	mkfs -t ${fs} -b 1024 -F -I 128 -j -L system -m 1 system.new  2>> "${LOGFILE}"
         mke2fs -t ${fs} -F -m 0 -b 1024 -L system -I 128 -g 8192 -J size=8 -O has_journal,sparse_super,^resize_inode,dir_index,filetype,^ext_attr system.new
-        tune2fs -o ^user_xattr,^acl system.new
+        tune2fs -c -1 -i 0 -o ^user_xattr,^acl system.new
 	mkdir system1  2>> "${LOGFILE}"
 	${SUDO} mount system.new system1 2>> "${LOGFILE}"
-	cd system 2>> "${LOGFILE}"
-	${SUDO} tar cf - * | sudo tar xvf - -C ../system1 2>> "${LOGFILE}"
-	r=$?
-	cd ..
+#	cd system 2>> "${LOGFILE}"
+#	${SUDO} tar cf - * | sudo tar xvf - -C ../system1 2>> "${LOGFILE}"
+#	r=$?
+#	cd ..
+	rsync -a system/ system1/
 	SystemUmount
 	${SUDO} umount -f system1 2>> "${LOGFILE}"
 	rm -rf system1
 
-	if [ $r -ne 0 ]
-	then
-		dialogLOG "Resize process has errors"
-	else
+#	if [ $r -ne 0 ]
+#	then
+#		dialogLOG "Resize process has errors"
+#	else
 		BackupFile system.img
 		mv system.new system.img  2>> "${LOGFILE}"
-	fi
+#	fi
 	SystemMount
 	popd >/dev/null
 }

@@ -36,7 +36,7 @@ cd flashdump
 WORKDIR=$(pwd)
 
 
-${SUDO} rkflashtool r 0 1 >parm.img
+${SUDO} rkflashtool r 0 0x200 >parm.img
 mkkrnlimg -r parm.img parameter
 
 PARAMFILE="parameter"
@@ -58,7 +58,7 @@ do
 			echo "Dumping ${sname} ($cmd)"
 			${SUDO} $cmd > Image/${sname}.img 2>>${LOGFILE}
 			;;
-		"backup" )
+		"0backup" )
 			echo "Dumping ${sname} ($cmd)"
 			${SUDO} $cmd > ${sname}.img 2>>${LOGFILE}
 			;;

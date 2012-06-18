@@ -92,13 +92,13 @@ BackupFile(){
 FileSignature(){
 	fn=$1
 	sigSize=${2:-4}
-	COMMONFILESIGNATURE=`dd if="$1" bs=1 count=4`
+	COMMONFILESIGNATURE=`head -c ${sigSize} ${fn}`
 }
 
 SystemFsck(){
 	pushd "$WORKDIR/Image"  >/dev/null
 	${SUDO} sync
-	${SUDO} /sbin/fsck.ext3 -yf system.img 2>&1 >> "$LOGFILE"
+	${SUDO} /sbin/e2fsck -yfD system.img 2>&1 >> "$LOGFILE"
 	popd >/dev/null
 }
 
@@ -150,10 +150,10 @@ SetFilePermissions(){
 SystemFixPermissions(){
 	SystemMount
 	pushd "$WORKDIR/Image"  >/dev/null
-	SetDirPermissions system/app/ 0 0 0644 0755
-	SetDirPermissions system/lib/ 0 0 0644 0755
-	SetDirPermissions system/bin/ 0 0 0755 0755
-	SetDirPermissions system/xbin/ 0 0 0755 0755
+	SetDirPermissions system/app/  0 2000 0644 0755
+	SetDirPermissions system/lib/  0 2000 0644 0755
+	SetDirPermissions system/bin/  0 2000 0755 0755
+	SetDirPermissions system/xbin/ 0 2000 0755 0755
 	${SUDO} chmod +s system/xbin/su
 	popd >/dev/null
 }
