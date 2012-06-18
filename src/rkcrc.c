@@ -113,7 +113,11 @@ main(int argc, char *argv[])
 	buf[3] = (crc >> 24) & 0xff;
 
 	write(out, buf, 4);
-
+	if(parm){
+       		lseek(out,16383, SEEK_SET);
+		buf[0]=0;
+		write(out,buf,1);
+	}
 	close(out);
 	close(in);
 
