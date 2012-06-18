@@ -12,11 +12,15 @@ MADEIMAGE=0
 
 makeUpdateImage2_MkInitRD(){
 	pushd "${WORKDIR}/Image/" >/dev/null
+	rebuild=$1
 
-        if [ $1 -ne 0 ]
+       	BackupFile boot.img
+       	BackupFile recovery.img
+
+        if [ ${rebuild} -ne 0 ]
         then
+		echo Rebuild boot && recovery
         	BackupFile "${initrd}"
-        	BackupFile boot.img
 
         	cd $ramdisk
         	find . -type f -name "*#" -print0 | xargs -0 ${SUDO} rm -f 
@@ -25,17 +29,16 @@ makeUpdateImage2_MkInitRD(){
         	cd ..
 
         	BackupFile "recovery-${initrd}"
-        	BackupFile recovery.img
 
         	cd recovery-$ramdisk
         	find . -type f -name "*#" -print0 | xargs -0 ${SUDO} rm -f 
         	find . -exec touch -d "1970-01-01 01:00" {} \;
         	find . ! -name "."|sort|cpio -oa -H newc --owner=root:root|gzip -n >../recovery-${initrd}
         	cd ..
-        fi
 
-#	abootimg --create boot.img -f bootimg.cfg -k $zimage -r ${initrd}
-#	abootimg --create recovery.img -f recovery.cfg -k $zimage -r recovery-${initrd}
+#		abootimg --create boot.img -f bootimg.cfg -k $zimage -r ${initrd}
+#		abootimg --create recovery.img -f recovery.cfg -k $zimage -r recovery-${initrd}
+        fi
 
 	mkkrnlimg -a "${initrd}" boot.img
 	mkkrnlimg -a "recovery-${initrd}" recovery.img

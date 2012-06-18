@@ -10,8 +10,8 @@ flash_Process(){
 
 	rkcrc -p parameter parm.img
 
-	echo "Erasing IDB"
-	${SUDO} rkflashtool e 0x0 0x1000
+#	echo "Erasing IDB"
+#	${SUDO} rkflashtool e 0x0 0x1000
 	echo "Flashing IDB"
 	${SUDO} rkflashtool w 0x0 0x20 < parm.img
 	${SUDO} rkflashtool w 0x20 0x20 < parm.img
@@ -20,8 +20,6 @@ flash_Process(){
 	${SUDO} rkflashtool w 0x80 0x20 < parm.img
 	PARAMFILE="parameter"
 	parameter_Parse
-
-        bs=512
 
 	sz=${#SECTION[@]}
 	for (( n=0; n<${#SECTION[@]}; n++ ))
@@ -39,21 +37,29 @@ flash_Process(){
 			"boot" | "kernel" | "misc" | "recovery" | "system" )
 				fn="Image/${sname}.img"
 				s=$(stat -c%s "$fn")
-				s=$[($s+$bs)/$bs]
+				s=$[($s+16384)/512]
+				s=$(printf 0x%08x $s)
+				#echo $ssize" "$s
+				s=$ssize
 				send=$[$sstart+$s]
 				send=$(printf 0x%08x $send)
 				cmd=`printf "rkflashtool w 0x%08x 0x%08x " ${sstart} ${s}`
 				echo "Flashing ${sname} ($sstart  $send)"
+				#echo $cmd
 				${SUDO} $cmd < ${fn}
 				;;
 			"backup" )
 				fn="update.img.tmp"
 				s=$(stat -c%s "$fn")
-				s=$[($s+$bs)/$bs]
+				s=$[($s+16384)/512]
+				s=$(printf 0x%08x $s)
+				#echo $ssize" "$s
+				s=$ssize
 				send=$[$sstart+$s]
 				send=$(printf 0x%08x $send)
 				cmd=`printf "rkflashtool w 0x%08x 0x%08x " ${sstart} ${s}`
 				echo "Flashing ${sname} ($sstart  $send)"
+				#echo $cmd
 				${SUDO} $cmd < ${fn}
 				;;
 			"cache" | "kpanic" | "userdata" )

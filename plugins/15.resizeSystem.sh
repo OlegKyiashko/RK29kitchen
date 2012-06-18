@@ -19,7 +19,7 @@ resizeSystem_Process(){
 #	${SUDO} tar cf - * | sudo tar xvf - -C ../system1 2>> "${LOGFILE}"
 #	r=$?
 #	cd ..
-	rsync -a system/ system1/
+	${SUDO} rsync -a system/ system1/
 	SystemUmount
 	${SUDO} umount -f system1 2>> "${LOGFILE}"
 	rm -rf system1

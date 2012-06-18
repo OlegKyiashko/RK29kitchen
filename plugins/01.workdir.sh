@@ -1,7 +1,7 @@
 #!/bin/bash
 #set -vx
 
-MenuAdd "Select work directory" "workdir_Select"
+MenuAdd "Change work directory" "workdir_Select"
 WORKTYPE=99
 WORKMODE="Undefined"
 
