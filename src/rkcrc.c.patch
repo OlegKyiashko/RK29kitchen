@@ -1,0 +1,23 @@
+*** rkcrc.c	2011-11-24 21:35:04.000000000 +0200
+--- rkcrc.c.new	2012-06-18 22:57:04.500410040 +0300
+*************** main(int argc, char *argv[])
+*** 113,119 ****
+  	buf[3] = (crc >> 24) & 0xff;
+  
+  	write(out, buf, 4);
+! 
+  	close(out);
+  	close(in);
+  
+--- 113,123 ----
+  	buf[3] = (crc >> 24) & 0xff;
+  
+  	write(out, buf, 4);
+! 	if(parm){
+!        		lseek(out,16383, SEEK_SET);
+! 		buf[0]=0;
+! 		write(out,buf,1);
+! 	}
+  	close(out);
+  	close(in);
+  
