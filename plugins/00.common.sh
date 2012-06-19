@@ -154,6 +154,7 @@ SystemFixPermissions(){
 	SetDirPermissions system/lib/  0 2000 0644 0755
 	SetDirPermissions system/bin/  0 2000 0755 0755
 	SetDirPermissions system/xbin/ 0 2000 0755 0755
+	${SUDO} chgrp 0 system/xbin/su
 	${SUDO} chmod +s system/xbin/su
 	popd >/dev/null
 }
