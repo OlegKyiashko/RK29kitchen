@@ -5,7 +5,7 @@ CFLAGS=-g -O3 -DUSE_OPENSSL -Wall
 LDLIBS=-lblkid
 LDLIBS=-lssl -lcrypto -lusb-1.0
 
-TARGETS := abootimg afptool img_unpack img_maker mkkrnlimg rkflashtool rkcrc
+TARGETS := abootimg afptool img_unpack img_maker mkkrnlimg rkflashtool rkflashtool29 rkcrc
 #to565
 
 .PHONY:	clean all install
