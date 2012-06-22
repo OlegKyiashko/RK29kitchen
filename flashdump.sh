@@ -36,7 +36,7 @@ cd flashdump
 WORKDIR=$(pwd)
 
 
-${SUDO} rkflashtool r 0 0x200 >parm.img
+${SUDO} rkflashtool29 r 0 0x200 >parm.img
 mkkrnlimg -r parm.img parameter
 
 PARAMFILE="parameter"
@@ -52,13 +52,13 @@ do
 	then
 		continue
 	fi
-	cmd=`printf "rkflashtool r 0x%08x 0x%08x " ${sstart} ${ssize}`
+	cmd=`printf "rkflashtool29 r 0x%08x 0x%08x " ${sstart} ${ssize}`
 	case $sname in
 		"boot" | "kernel" | "misc" | "recovery" | "system" )
 			echo "Dumping ${sname} ($cmd)"
 			${SUDO} $cmd > Image/${sname}.img 2>>${LOGFILE}
 			;;
-		"0backup" )
+		"backup" )
 			echo "Dumping ${sname} ($cmd)"
 			${SUDO} $cmd > ${sname}.img 2>>${LOGFILE}
 			;;

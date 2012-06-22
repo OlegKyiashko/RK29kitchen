@@ -24,4 +24,4 @@ patch <rkcrc.c.patch
 
 echo '#define VERSION_STR ""' >version.h
 
-#make clean all install
+make clean all install

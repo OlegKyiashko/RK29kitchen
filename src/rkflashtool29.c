@@ -65,9 +65,9 @@ int _CRT_fmode = _O_BINARY;
 #define RKFT_2G         0x400000 /* in 512 byte blocks */
 
 #define RKFT_CMD_INIT   0x80000600
-#define RKFT_CMD_READ   0x80000A04
+#define RKFT_CMD_READ   0x80000A14
 #define RKFT_CMD_WRITE  0x00000A15
-#define RKFT_CMD_REBOOT 0x800006FF
+#define RKFT_CMD_REBOOT 0x000006FF
 
 #define SETBE32(a, v) ((uint8_t*)a)[3] =  v      & 0xff; \
                       ((uint8_t*)a)[2] = (v>>8 ) & 0xff; \

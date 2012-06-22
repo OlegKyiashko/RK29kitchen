@@ -11,13 +11,13 @@ flash_Process(){
 	rkcrc -p parameter parm.img
 
 #	echo "Erasing IDB"
-#	${SUDO} rkflashtool e 0x0 0x1000
+#	${SUDO} rkflashtool29 e 0x0 0x1000
 	echo "Flashing IDB"
-	${SUDO} rkflashtool w 0x0 0x20 < parm.img
-	${SUDO} rkflashtool w 0x20 0x20 < parm.img
-	${SUDO} rkflashtool w 0x40 0x20 < parm.img
-	${SUDO} rkflashtool w 0x60 0x20 < parm.img
-	${SUDO} rkflashtool w 0x80 0x20 < parm.img
+	${SUDO} rkflashtool29 w 0x0 0x20 < parm.img
+	${SUDO} rkflashtool29 w 0x20 0x20 < parm.img
+	${SUDO} rkflashtool29 w 0x40 0x20 < parm.img
+	${SUDO} rkflashtool29 w 0x60 0x20 < parm.img
+	${SUDO} rkflashtool29 w 0x80 0x20 < parm.img
 	PARAMFILE="parameter"
 	parameter_Parse
 
@@ -43,7 +43,7 @@ flash_Process(){
 				s=$ssize
 				send=$[$sstart+$s]
 				send=$(printf 0x%08x $send)
-				cmd=`printf "rkflashtool w 0x%08x 0x%08x " ${sstart} ${s}`
+				cmd=`printf "rkflashtool29 w 0x%08x 0x%08x " ${sstart} ${s}`
 				echo "Flashing ${sname} ($sstart  $send)"
 				#echo $cmd
 				${SUDO} $cmd < ${fn}
@@ -57,19 +57,19 @@ flash_Process(){
 				s=$ssize
 				send=$[$sstart+$s]
 				send=$(printf 0x%08x $send)
-				cmd=`printf "rkflashtool w 0x%08x 0x%08x " ${sstart} ${s}`
+				cmd=`printf "rkflashtool29 w 0x%08x 0x%08x " ${sstart} ${s}`
 				echo "Flashing ${sname} ($sstart  $send)"
 				#echo $cmd
 				${SUDO} $cmd < ${fn}
 				;;
 			"cache" | "kpanic" | "userdata" )
-				cmd=`printf "rkflashtool e 0x%08x 0x200 " ${sstart}`
+				cmd=`printf "rkflashtool29 e 0x%08x 0x200 " ${sstart}`
 				echo "Erase ${sname} ($sstart )"
 				#${SUDO} $cmd
 				;;
 		esac
 	done
-	${SUDO} rkflashtool b
+	${SUDO} rkflashtool29 b
 
 
 	popd >/dev/null
@@ -81,7 +81,7 @@ flash_Dump(){
 	WORKDIR=$(pwd)
 
 
-	${SUDO} rkflashtool r 0 1 >parm.img
+	${SUDO} rkflashtool29 r 0 1 >parm.img
 	mkkrnlimg -r parm.img parameter
 
 	PARAMFILE="parameter"
@@ -97,7 +97,7 @@ flash_Dump(){
 		then
 			continue
 		fi
-		cmd=`printf "rkflashtool r 0x%08x 0x%08x " ${sstart} ${ssize}`
+		cmd=`printf "rkflashtool29 r 0x%08x 0x%08x " ${sstart} ${ssize}`
 		case $sname in
 			"boot" | "kernel" | "misc" | "recovery" | "system" )
 				echo "Dumping ${sname} ($cmd)"
@@ -135,7 +135,7 @@ flash_Main(){
 
 	dialogOK "Power off you tablet.\nPress the VOL- button and connect usb cable to PC and tablet\nRelease button"
 
-	${SUDO} rkflashtool r 0x0 0xa0 >"$tempfile"
+	${SUDO} rkflashtool29 r 0x0 0xa0 >"$tempfile"
 	s=$(stat -c%s "$tempfile")
 	if [ $s -ne 81920 ]
 	then
