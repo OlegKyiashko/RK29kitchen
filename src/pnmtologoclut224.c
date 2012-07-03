@@ -1,9 +1,10 @@
-
 /*
  *  Convert a logo in ASCII PNM format to C source suitable for inclusion in
  *  the Linux kernel
  *
  *  (C) Copyright 2001-2003 by Geert Uytterhoeven <geert@linux-m68k.org>
+ *
+ *  2012 by onk (create only clut224 binary logodata and logoclut)
  *
  *  --------------------------------------------------------------------------
  *
@@ -23,22 +24,11 @@
 
 static const char *programname;
 static const char *filename;
-static const char *logoname = "linux_logo";
 static const char *outputname;
 static FILE *out;
 
 
-#define LINUX_LOGO_MONO		1	/* monochrome black/white */
-#define LINUX_LOGO_VGA16	2	/* 16 colors VGA text palette */
 #define LINUX_LOGO_CLUT224	3	/* 224 colors */
-#define LINUX_LOGO_GRAY256	4	/* 256 levels grayscale */
-
-static const char *logo_types[LINUX_LOGO_GRAY256+1] = {
-	[LINUX_LOGO_MONO] = "LINUX_LOGO_MONO",
-	[LINUX_LOGO_VGA16] = "LINUX_LOGO_VGA16",
-	[LINUX_LOGO_CLUT224] = "LINUX_LOGO_CLUT224",
-	[LINUX_LOGO_GRAY256] = "LINUX_LOGO_GRAY256"
-};
 
 #define MAX_LINUX_LOGO_COLORS	224
 
@@ -68,19 +58,18 @@ static const struct color clut_vga16[16] = {
 };
 
 
-static int logo_type = LINUX_LOGO_CLUT224;
-static unsigned int logo_width;
-static unsigned int logo_height;
+static unsigned short logo_width;
+static unsigned short logo_height;
 static struct color **logo_data;
 static struct color logo_clut[MAX_LINUX_LOGO_COLORS];
-static unsigned int logo_clutsize;
+static unsigned short logo_clutsize;
 
 static void die(const char *fmt, ...)
 	__attribute__ ((noreturn)) __attribute ((format (printf, 1, 2)));
 	static void usage(void) __attribute ((noreturn));
 
 
-static unsigned int get_number(FILE *fp)
+static unsigned short get_number(FILE *fp)
 {
 	int c, val;
 
@@ -110,18 +99,18 @@ static unsigned int get_number(FILE *fp)
 	return val;
 }
 
-static unsigned int get_number255(FILE *fp, unsigned int maxval)
+static unsigned short get_number255(FILE *fp, unsigned short maxval)
 {
-	unsigned int val = get_number(fp);
+	unsigned short val = get_number(fp);
 	return (255*val+maxval/2)/maxval;
 }
 
 static void read_image(void)
 {
 	FILE *fp;
-	unsigned int i, j;
+	unsigned short i, j;
 	int magic;
-	unsigned int maxval;
+	unsigned short maxval;
 
 	/* open image file */
 	fp = fopen(filename, "r");
@@ -227,7 +216,7 @@ static void write_hex(unsigned char byte)
 
 static void write_logo_clut224(void)
 {
-	unsigned int i, j, k;
+	unsigned short i, j, k;
 
 	/* validate image */
 	for (i = 0; i < logo_height; i++)
@@ -244,11 +233,13 @@ static void write_logo_clut224(void)
 			}
 		}
 
-	out = fopen("logodata", "wb");
+	out = fopen("logo_data", "wb");
 	if (!out)
 		die("Cannot create file %s: %s\n", outputname, strerror(errno));
 
 	/* write logo data */
+	fwrite(&logo_width, sizeof(logo_width),1,out);
+	fwrite(&logo_height, sizeof(logo_height),1,out);
 	for (i = 0; i < logo_height; i++)
 		for (j = 0; j < logo_width; j++) {
 			for (k = 0; k < logo_clutsize; k++)
@@ -256,19 +247,21 @@ static void write_logo_clut224(void)
 					break;
 			write_hex(k+32);
 		}
-
 	fclose(out);
-	out = fopen("logoclut", "wb");
+
+	out = fopen("logo_clut", "wb");
 	if (!out)
 		die("Cannot create file %s: %s\n", outputname, strerror(errno));
-	
+
 	/* write logo clut */
 	write_hex_cnt = 0;
+	write_hex(logo_clutsize);
 	for (i = 0; i < logo_clutsize; i++) {
 		write_hex(logo_clut[i].red);
 		write_hex(logo_clut[i].green);
 		write_hex(logo_clut[i].blue);
 	}
+	fclose(out);
 }
 
 static void die(const char *fmt, ...)
@@ -291,15 +284,12 @@ static void usage(void)
 
 int main(int argc, char *argv[])
 {
-	int opt;
-
 	programname = argv[0];
-
-	logo_type = LINUX_LOGO_CLUT224;
-
-	filename = argv[optind];
+	filename = argv[1];
 
 	read_image();
 	write_logo_clut224();
+
+	return 0;
 }
 
