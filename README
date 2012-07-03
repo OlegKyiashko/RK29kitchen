@@ -1,5 +1,3 @@
-!!!SOME LATEST BUILD HAVE TROUBLES WITH BUILD UPDATE IMG!!!
-
 development and testing in progress!!!
 
 English:
@@ -19,6 +17,7 @@ You can:
 - Choose and install some system applications
 - Change the file size system.img
 - Create update.img
+- flash update to device
 
 also
 - Create their own plug-ins
@@ -80,6 +79,7 @@ Russian:
 - выбирать и устанавливать некоторые системные приложения
 - изменять размер файла system.img
 - создавать update.img
+- обновлять прошивку на устройстве
 
 также
 - создавать свои плагины
