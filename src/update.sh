@@ -1,6 +1,6 @@
-mkdir old
-rm -f old/*
-mv *\.c *\.h old
+#mkdir old
+#rm -f old/*
+#mv *\.c *\.h old
 
 fn=jhonxie.abootimg_rockchip.zip
 rm $fn 2>/dev/null

@@ -62,14 +62,14 @@ static unsigned short logo_width;
 static unsigned short logo_height;
 static struct color **logo_data;
 static struct color logo_clut[MAX_LINUX_LOGO_COLORS];
-static unsigned short logo_clutsize;
+static unsigned int logo_clutsize;
 
 static void die(const char *fmt, ...)
 	__attribute__ ((noreturn)) __attribute ((format (printf, 1, 2)));
 	static void usage(void) __attribute ((noreturn));
 
 
-static unsigned short get_number(FILE *fp)
+static unsigned int get_number(FILE *fp)
 {
 	int c, val;
 
@@ -99,18 +99,18 @@ static unsigned short get_number(FILE *fp)
 	return val;
 }
 
-static unsigned short get_number255(FILE *fp, unsigned short maxval)
+static unsigned int get_number255(FILE *fp, unsigned int maxval)
 {
-	unsigned short val = get_number(fp);
+	unsigned int val = get_number(fp);
 	return (255*val+maxval/2)/maxval;
 }
 
 static void read_image(void)
 {
 	FILE *fp;
-	unsigned short i, j;
+	unsigned int i, j;
 	int magic;
-	unsigned short maxval;
+	unsigned int maxval;
 
 	/* open image file */
 	fp = fopen(filename, "r");
@@ -216,7 +216,7 @@ static void write_hex(unsigned char byte)
 
 static void write_logo_clut224(void)
 {
-	unsigned short i, j, k;
+	unsigned int i, j, k;
 
 	/* validate image */
 	for (i = 0; i < logo_height; i++)
@@ -238,8 +238,10 @@ static void write_logo_clut224(void)
 		die("Cannot create file %s: %s\n", outputname, strerror(errno));
 
 	/* write logo data */
-	fwrite(&logo_width, sizeof(logo_width),1,out);
-	fwrite(&logo_height, sizeof(logo_height),1,out);
+        write_hex((logo_width>>8)&0xff);
+        write_hex((logo_width)&0xff);
+        write_hex((logo_height>>8)&0xff);
+        write_hex((logo_height)&0xff);
 	for (i = 0; i < logo_height; i++)
 		for (j = 0; j < logo_width; j++) {
 			for (k = 0; k < logo_clutsize; k++)
