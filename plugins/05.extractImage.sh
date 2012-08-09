@@ -53,8 +53,8 @@ extractImage_ExtractBootImg(){
 			;;
 		*)
 			dialogOK "Unknown boot.img type :("
-			popd >/dev/null
-			exit 1
+#			popd >/dev/null
+#			exit 1
 	esac
 	popd >/dev/null
 }
@@ -73,8 +73,8 @@ extractImage_ExtractKernelImg(){
 			;;
 		*)
 			dialogOK "Unknown kernel.img type :("
-			popd >/dev/null
-			exit 1
+#			popd >/dev/null
+#			exit 1
 	esac
 	popd >/dev/null
 }
@@ -97,8 +97,8 @@ extractImage_ExtractRecoveryImg(){
 			;;
 		*)
 			dialogOK "Unknown recovery.img type :("
-			popd >/dev/null
-			exit 1
+#			popd >/dev/null
+#			exit 1
 	esac
 	popd >/dev/null
 }
