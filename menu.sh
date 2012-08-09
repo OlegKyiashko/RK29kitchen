@@ -1,6 +1,16 @@
 #!/bin/bash
 #set -vx 
 
+dialog 2>/dev/null
+r=$?
+if [ $r -ne 0 ]
+then
+        echo "dialog not installed! check dependences"
+        echo -n "Press Enter to exit"
+        read a
+        exit 1
+fi
+
 BASEDIR=`dirname $0`
 pushd "$BASEDIR" >/dev/null
 BASEDIR=`pwd`
