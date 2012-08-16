@@ -1,15 +1,10 @@
 #!/bin/bash
 #set -vx 
 
-dialog 2>/dev/null
-r=$?
-if [ $r -ne 0 ]
-then
-        echo "dialog not installed! check dependences"
-        echo -n "Press Enter to exit"
-        read a
-        exit 1
-fi
+command -v dialog >/dev/null 2>&1 || { echo >&2 "dialog required, but it's not installed.  Aborting."; exit 1; }
+command -v cpio >/dev/null 2>&1 || { echo >&2 "cpio required, but it's not installed.  Aborting."; exit 1; }
+command -v zip >/dev/null 2>&1 || { echo >&2 "zip required, but it's not installed.  Aborting."; exit 1; }
+command -v zcat >/dev/null 2>&1 || { echo >&2 "zcat required, but it's not installed.  Aborting."; exit 1; }
 
 BASEDIR=`dirname $0`
 pushd "$BASEDIR" >/dev/null
@@ -26,7 +21,14 @@ then
 	WORKDIR="${WORKDIR}/work/"
 fi
 
-BINDIR="${BASEDIR}/bin"
+OS=`uname -o`
+if [ "${OS}" == "Cygwin" ]
+then
+        BINDIR="${BASEDIR}/win"
+else
+        BINDIR="${BASEDIR}/bin"
+fi
+
 LOGFILE="${BASEDIR}/log"
 PLUGINS="${BASEDIR}/plugins"
 PATH="${BINDIR}":$PATH
