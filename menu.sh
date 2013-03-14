@@ -47,6 +47,21 @@ do
 done
 popd >/dev/null
 
+pushd "${BINDIR}" >/dev/null
+for file in `ls -1`
+do
+	chmod +x $file
+done
+popd >/dev/null
+
+command -v abootimg >/dev/null 2>&1 || { echo >&2 "bin/abootimg required, but it's not installed.  Aborting."; exit 1; }
+command -v afptool >/dev/null 2>&1 || { echo >&2 "bin/afptool required, but it's not installed.  Aborting."; exit 1; }
+command -v img_maker >/dev/null 2>&1 || { echo >&2 "bin/img_maker required, but it's not installed.  Aborting."; exit 1; }
+command -v img_unpack >/dev/null 2>&1 || { echo >&2 "bin/img_unpack required, but it's not installed.  Aborting."; exit 1; }
+command -v mkkrnlimg >/dev/null 2>&1 || { echo >&2 "bin/mkkrnlimg required, but it's not installed.  Aborting."; exit 1; }
+command -v rkcrc >/dev/null 2>&1 || { echo >&2 "bin/rkcrc required, but it's not installed.  Aborting."; exit 1; }
+command -v rkflashtool29 >/dev/null 2>&1 || { echo >&2 "bin/rkflashtool29 required, but it's not installed.  Aborting."; exit 1; }
+
 MenuAdd "Exit" "exit 0"
 
 cd "${WORKDIR}"
